@@ -14,7 +14,7 @@ sqlalchemy = "^2.0.51"
 alembic = "^1.18.5"
 
 [tool.poetry.scripts]
-popular-banco = "ranking_fatec.cli:popular_banco"
+sincronizar-sistema = "ranking_fatec.cli:sincronizar_sistema"
 
 [tool.poetry.group.dev.dependencies]
 black = "^26.5.1"

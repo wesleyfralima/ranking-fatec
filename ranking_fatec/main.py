@@ -222,23 +222,8 @@ def recalcular_todos_os_candidatos_do_banco(db: Session) -> dict:
     pelo menos um candidato cadastrado e força o recálculo do grupo.
     """
     try:
-        # Busca apenas os grupos (chaves compostas) que possuem candidatos ativos
-        grupos_ativos = (
-            db.query(Candidato.faculdade, Candidato.curso, Candidato.periodo)
-            .distinct()
-            .all()
-        )
-
-        contador_grupos = 0
-
-        # Varre apenas os grupos que realmente têm trabalho a ser feito
-        for faculdade, curso, periodo in grupos_ativos:
-            recalcular_probabilidades(
-                db=db, faculdade=faculdade, curso=curso, periodo=periodo
-            )
-            contador_grupos += 1
-
-        db.commit()
+        from ranking_fatec.cli import recalcular_todas_as_probabilidades
+        contador_grupos = recalcular_todas_as_probabilidades(db)
 
         return {
             "status": "sucesso",

@@ -12,7 +12,7 @@ echo "========================================"
 echo "Inserindo dados iniciais..."
 echo "========================================"
 
-poetry run popular-banco
+poetry run sincronizar-sistema
 
 echo "========================================"
 echo "Iniciando aplicação..."
