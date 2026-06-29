@@ -95,6 +95,7 @@
         const [respostasUsuario, setRespostasUsuario] = useState({});
         const [stringGabarito, setStringGabarito] = useState('');
         const [carregando, setCarregando] = useState(false);
+        const [buscandoUser, setBuscandoUser] = useState(false);
         const [ultimoEnvio, setUltimoEnvio] = useState(null);
 
         const [filtroCampus, setFiltroCampus] = useState('');
@@ -146,26 +147,92 @@
             setForm(prev => ({...prev, faculdade: campus, periodo: '', curso: ''}));
             setListaPeriodos([]);
             setListaCursos([]);
-            if (!campus) return;
+            if (!campus) return [];
 
             try {
                 const res = await fetch(`/apps/ranking-fatec/api/periods?campus=${encodeURIComponent(campus)}`);
-                setListaPeriodos(await res.json());
+                const data = await res.json();
+                setListaPeriodos(data);
+                return data;
             } catch (e) {
                 console.error(e);
+                return [];
             }
         };
 
-        const handlePeriodoChange = async (periodo) => {
+        const handlePeriodoChange = async (periodo, campusAtual = form.faculdade) => {
             setForm(prev => ({...prev, periodo: periodo, curso: ''}));
             setListaCursos([]);
-            if (!periodo) return;
+            if (!periodo) return [];
 
             try {
-                const res = await fetch(`/apps/ranking-fatec/api/courses?campus=${encodeURIComponent(form.faculdade)}&periodo=${encodeURIComponent(periodo)}`);
-                setListaCursos(await res.json());
+                const res = await fetch(`/apps/ranking-fatec/api/courses?campus=${encodeURIComponent(campusAtual)}&periodo=${encodeURIComponent(periodo)}`);
+                const data = await res.json();
+                setListaCursos(data);
+                return data;
             } catch (e) {
                 console.error(e);
+                return [];
+            }
+        };
+
+        const buscarCandidato = async () => {
+            if (!form.nome || form.nome.trim() === '') {
+                lancarNotificacao("Digite um nome ou nick para buscar!", "erro");
+                return;
+            }
+
+            setBuscandoUser(true);
+            try {
+                const res = await fetch(`/apps/ranking-fatec/api/candidato/${encodeURIComponent(form.nome.trim())}`);
+                if (!res.ok) {
+                    if (res.status === 404) {
+                        lancarNotificacao("Usuário não encontrado. Você pode preenchê-lo como um novo registro!", "erro");
+                    } else {
+                        lancarNotificacao("Erro ao buscar dados do usuário.", "erro");
+                    }
+                    return;
+                }
+
+                const data = await res.json();
+
+                // Atualiza o formulário base
+                setForm({
+                    nome: data.nome,
+                    faculdade: data.faculdade,
+                    periodo: data.periodo,
+                    curso: data.curso,
+                    redacao: data.redacao,
+                    nota_enem: data.nota_enem !== null ? data.nota_enem : '',
+                    is_afro: data.is_afro,
+                    is_publica: data.is_publica
+                });
+
+                // Força o carregamento em cascata dos combos de períodos e cursos daquela unidade buscada
+                try {
+                    const resPeriodos = await fetch(`/apps/ranking-fatec/api/periods?campus=${encodeURIComponent(data.faculdade)}`);
+                    const listP = await resPeriodos.json();
+                    setListaPeriodos(listP);
+
+                    const resCursos = await fetch(`/apps/ranking-fatec/api/courses?campus=${encodeURIComponent(data.faculdade)}&periodo=${encodeURIComponent(data.periodo)}`);
+                    const listC = await resCursos.json();
+                    setListaCursos(listC);
+                } catch (errCascata) {
+                    console.error("Erro na atualização dos filtros secundários:", errCascata);
+                }
+
+                // Restaura o gabarito de respostas dele
+                setRespostasUsuario(data.respostas || {});
+                const novaString = qNumeros.map(num => data.respostas[num] || ' ').join('').trimEnd();
+                setStringGabarito(novaString);
+
+                lancarNotificacao(`Dados de "${data.nome}" carregados com sucesso! Altere o que precisar e reenvie.`);
+
+            } catch (e) {
+                console.error(e);
+                lancarNotificacao("Erro de comunicação com o servidor.", "erro");
+            } finally {
+                setBuscandoUser(false);
             }
         };
 
@@ -448,18 +515,39 @@
                                     vestibular.</p>
                             </div>
 
+                            {/* Alerta de Recálculo/Atualização */}
+                            <div
+                                className="bg-slate-900/80 border border-slate-700/60 rounded-xl p-3 text-xs leading-normal text-slate-300 flex items-start gap-2">
+                                <span className="text-amber-400 mt-0.5">💡</span>
+                                <p>
+                                    Para <strong>atualizar</strong> ou <strong>recalcular</strong> suas notas, digite
+                                    seu Nome/Nick exatamente igual e clique em <strong>Buscar</strong> para carregar o
+                                    formulário.
+                                </p>
+                            </div>
+
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
                                     <label className="block text-xs font-semibold uppercase text-slate-400 mb-1">Nome ou
                                         Nick</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        value={form.nome}
-                                        onChange={e => setForm({...form, nome: e.target.value})}
-                                        className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm focus:outline-none focus:border-amber-400 text-slate-100 transition"
-                                        placeholder="nickname"
-                                    />
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            required
+                                            value={form.nome}
+                                            onChange={e => setForm({...form, nome: e.target.value})}
+                                            className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm focus:outline-none focus:border-amber-400 text-slate-100 transition"
+                                            placeholder="nickname"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={buscarCandidato}
+                                            disabled={buscandoUser}
+                                            className="bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3 py-2 rounded-lg text-xs font-bold text-amber-400 transition hover:text-white disabled:opacity-40 shrink-0"
+                                        >
+                                            {buscandoUser ? '...' : 'Buscar'}
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <TypeAhead
@@ -619,7 +707,6 @@
                     </div>
                 </div>
 
-                {}
                 {/* Block 3: Consolidated Ranking Table */}
                 <div className="bg-slate-800 rounded-2xl border border-slate-750 overflow-hidden shadow-2xl w-full">
                     <div

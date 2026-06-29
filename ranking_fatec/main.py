@@ -418,6 +418,35 @@ def disparar_recalculo_geral(db: Session = Depends(get_db)):
     return recalcular_todos_os_candidatos_do_banco(db)
 
 
+@app.get("/api/candidato/{nome}")
+def obter_candidato_por_nome(nome: str, db: Session = Depends(get_db)):
+    candidato = db.query(Candidato).filter(Candidato.nome == nome.strip()).first()
+
+    if not candidato:
+        raise HTTPException(
+            status_code=404, detail="Candidato não encontrado no ranking atual."
+        )
+
+    # Como as respostas são salvas como String JSON no banco,
+    # precisamos converter de volta para dicionário antes de enviar
+    try:
+        respostas_dict = json.loads(candidato.respostas) if candidato.respostas else {}
+    except Exception:
+        respostas_dict = {}
+
+    return {
+        "nome": candidato.nome,
+        "faculdade": candidato.faculdade,
+        "curso": candidato.curso,
+        "periodo": candidato.periodo,
+        "redacao": candidato.redacao,
+        "nota_enem": candidato.nota_enem,
+        "is_afro": candidato.is_afro,
+        "is_publica": candidato.is_publica,
+        "respostas": respostas_dict,
+    }
+
+
 @app.get("/", response_class=HTMLResponse)
 def index():
     with open("templates/index.html", encoding="utf-8") as f:
