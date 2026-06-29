@@ -447,14 +447,14 @@
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
                                     <label className="block text-xs font-semibold uppercase text-slate-400 mb-1">Nome ou
-                                        Nick do Reddit</label>
+                                        Nick</label>
                                     <input
                                         type="text"
                                         required
                                         value={form.nome}
                                         onChange={e => setForm({...form, nome: e.target.value})}
                                         className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm focus:outline-none focus:border-amber-400 text-slate-100 transition"
-                                        placeholder="u/seu_nick_reddit"
+                                        placeholder="nickname"
                                     />
                                 </div>
 
