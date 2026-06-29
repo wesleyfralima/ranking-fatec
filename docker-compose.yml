@@ -1,15 +1,19 @@
+name: ranking-fatec
+
 services:
 
   mvp:
-
     build: .
-
-    container_name: ranking-fatec
-
+    image: cms/ranking-fatec:1.0.0
+    container_name: ranking-fatec-mvp
     restart: unless-stopped
-
     ports:
-      - "8002:8000"
-
+      - "127.0.0.1:8002:8000"
     volumes:
       - ./data:/app/data
+    networks:
+      - global-network
+
+networks:
+  global-network:
+    external: true
