@@ -128,6 +128,9 @@ def calcular_probabilidade_aprovacao(
     # 2) Nota de Corte (Maior carga de cálculo)
     # --------------------------------------
     if nota_corte is not None:
+        # Considera que a prova foi levemente mais
+        # difícil do que a de 1º semestre de 2026
+        nota_corte *= 0.965
         diff = nfc - nota_corte
 
         # Se a nota é maior que o corte histórico, o ganho tem que ser limpo.
