@@ -1,0 +1,15 @@
+services:
+
+  ranking:
+
+    build: .
+
+    container_name: ranking-fatec-mvp
+
+    restart: unless-stopped
+
+    ports:
+      - "8002:8000"
+
+    volumes:
+      - ./data:/app/data

@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking FATEC - 2º Sem 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
+
+<div id="root"></div>
+
+<script type="text/babel">
+    const {useState, useEffect, useRef} = React;
+
+    function TypeAhead({label, placeholder, lista, valorSelecionado, aoSelecionar}) {
+        const [busca, setBusca] = useState('');
+        const [aberto, setAberto] = useState(false);
+        const containerRef = useRef(null);
+
+        useEffect(() => {
+            setBusca(valorSelecionado || '');
+        }, [valorSelecionado]);
+
+        useEffect(() => {
+            const fechar = (e) => {
+                if (containerRef.current && !containerRef.current.contains(e.target)) setAberto(false);
+            };
+            document.addEventListener("mousedown", fechar);
+            return () => document.removeEventListener("mousedown", fechar);
+        }, []);
+
+        const filtrados = lista.filter(item => item.toLowerCase().includes(busca.toLowerCase()));
+
+        return (
+            <div className="relative" ref={containerRef}>
+                <label className="block text-xs font-semibold uppercase text-slate-400 mb-1">{label}</label>
+                <input
+                    type="text"
+                    required
+                    placeholder={placeholder}
+                    value={busca}
+                    onFocus={() => setAberto(true)}
+                    onChange={(e) => {
+                        setBusca(e.target.value);
+                        if (valorSelecionado) aoSelecionar('');
+                        setAberto(true);
+                    }}
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm focus:outline-none focus:border-amber-400 text-slate-100 placeholder-slate-600 transition"
+                />
+                {aberto && (
+                    <div
+                        className="absolute z-50 w-full mt-1 bg-slate-800 border border-slate-700 rounded-lg shadow-2xl max-h-48 overflow-y-auto text-sm custom-scrollbar">
+                        {filtrados.length === 0 ? (
+                            <div className="p-2 text-xs text-slate-500 italic">Nenhum campus encontrado</div>
+                        ) : (
+                            filtrados.map((item, idx) => (
+                                <div
+                                    key={idx}
+                                    onClick={() => {
+                                        aoSelecionar(item);
+                                        setBusca(item);
+                                        setAberto(false);
+                                    }}
+                                    className="p-2 hover:bg-slate-700 cursor-pointer text-slate-300 hover:text-white transition-colors"
+                                >
+                                    {item}
+                                </div>
+                            ))
+                        )}
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    function App() {
+        const [ranking, setRanking] = useState([]);
+        const [gabarito, setGabarito] = useState({});
+        const [formExpandido, setFormExpandido] = useState(false);
+        const [toast, setToast] = useState(null);
+
+        const [listaCampuses, setListaCampuses] = useState([]);
+        const [listaPeriodos, setListaPeriodos] = useState([]);
+        const [listaCursos, setListaCursos] = useState([]);
+
+        const [form, setForm] = useState({
+            nome: '', faculdade: '', curso: '', periodo: '',
+            redacao: '', nota_enem: '', is_afro: false, is_publica: false
+        });
+
+        const [respostasUsuario, setRespostasUsuario] = useState({});
+        const [stringGabarito, setStringGabarito] = useState('');
+        const [carregando, setCarregando] = useState(false);
+        const [ultimoEnvio, setUltimoEnvio] = useState(null);
+
+        const [filtroCampus, setFiltroCampus] = useState('');
+        const [filtroCurso, setFiltroCurso] = useState('');
+
+        const inputsRef = useRef({});
+
+        const totalRespondidas = Object.values(respostasUsuario).filter(v => v && /^[A-E]$/i.test(v)).length;
+
+        const lancarNotificacao = (mensagem, tipo = 'sucesso') => {
+            setToast({mensagem, tipo});
+            setTimeout(() => setToast(null), 5000);
+        };
+
+        const carregarRanking = async () => {
+            try {
+                const res = await fetch('/api/ranking');
+                setRanking(await res.json());
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const carregarGabarito = async () => {
+            try {
+                const res = await fetch('/api/gabarito');
+                setGabarito(await res.json());
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const carregarCampuses = async () => {
+            try {
+                const res = await fetch('/api/campuses');
+                setListaCampuses(await res.json());
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        useEffect(() => {
+            carregarRanking();
+            carregarGabarito();
+            carregarCampuses();
+        }, []);
+
+        const handleCampusChange = async (campus) => {
+            setForm(prev => ({...prev, faculdade: campus, periodo: '', curso: ''}));
+            setListaPeriodos([]);
+            setListaCursos([]);
+            if (!campus) return;
+
+            try {
+                const res = await fetch(`/api/periods?campus=${encodeURIComponent(campus)}`);
+                setListaPeriodos(await res.json());
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const handlePeriodoChange = async (periodo) => {
+            setForm(prev => ({...prev, periodo: periodo, curso: ''}));
+            setListaCursos([]);
+            if (!periodo) return;
+
+            try {
+                const res = await fetch(`/api/courses?campus=${encodeURIComponent(form.faculdade)}&periodo=${encodeURIComponent(periodo)}`);
+                setListaCursos(await res.json());
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const qNumeros = Object.keys(gabarito).map(Number).sort((a, b) => a - b);
+
+        const handleStringChange = (e) => {
+            const val = e.target.value.toUpperCase().replace(/[^A-E]/g, '');
+            setStringGabarito(val);
+            const novasRespostas = {};
+            qNumeros.forEach((q, idx) => {
+                if (val[idx]) novasRespostas[q] = val[idx];
+            });
+            setRespostasUsuario(novasRespostas);
+        };
+
+        const handleInputChange = (q, val, idx) => {
+            const letra = val.toUpperCase().replace(/[^A-E]/g, '');
+            const novasRespostas = {...respostasUsuario, [q]: letra};
+            setRespostasUsuario(novasRespostas);
+
+            const novaString = qNumeros.map(num => novasRespostas[num] || ' ').join('').trimEnd();
+            setStringGabarito(novaString);
+
+            if (letra && idx < qNumeros.length - 1) {
+                const proximoNum = qNumeros[idx + 1];
+                inputsRef.current[proximoNum]?.focus();
+                inputsRef.current[proximoNum]?.select();
+            }
+        };
+
+        const handleKeyDown = (e, q, idx) => {
+            if (e.key === 'Backspace' && !respostasUsuario[q] && idx > 0) {
+                const anteriorNum = qNumeros[idx - 1];
+                inputsRef.current[anteriorNum]?.focus();
+                inputsRef.current[anteriorNum]?.select();
+            }
+        };
+
+        const handleSubmit = async (e) => {
+            e.preventDefault();
+            if (!form.nome || !form.faculdade || !form.curso || !form.periodo) {
+                lancarNotificacao("Complete o fluxo de campus, período e curso para enviar!", "erro");
+                return;
+            }
+
+            if (totalRespondidas < 60) {
+                lancarNotificacao(`Você precisa preencher todas as 60 respostas antes de enviar! (Preenchidas: ${totalRespondidas}/60)`, "erro");
+                return;
+            }
+
+            setCarregando(true);
+            try {
+                const payload = {
+                    ...form,
+                    redacao: parseFloat(form.redacao || 0),
+                    nota_enem: (form.nota_enem !== '' && form.nota_enem !== null && form.nota_enem !== undefined) ? parseFloat(form.nota_enem) : null,
+                    respostas: respostasUsuario
+                };
+
+                const response = await fetch('/api/ranking', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    let mensagemErro = "Erro interno ao salvar dados no servidor.";
+                    try {
+                        const corpoErro = await response.json();
+                        if (corpoErro && corpoErro.detail) {
+                            mensagemErro = corpoErro.detail;
+                        }
+                    } catch (err_resp) {
+                        mensagemErro = `Erro HTTP ${response.status}: Não foi possível processar a requisição.`;
+                    }
+                    throw new Error(mensagemErro);
+                }
+
+                const resultado = await response.json();
+
+                setUltimoEnvio({
+                    nome: form.nome,
+                    faculdade: form.faculdade,
+                    curso: form.curso,
+                    periodo: form.periodo,
+                    acertos: resultado.acertos,
+                    redacao: form.redacao,
+                    nfc: resultado.nfc,
+                    probabilidade: resultado.probabilidade,
+                    is_afro: form.is_afro,
+                    is_publica: form.is_publica
+                });
+
+                setForm({
+                    nome: '',
+                    faculdade: '',
+                    curso: '',
+                    periodo: '',
+                    redacao: '',
+                    nota_enem: '',
+                    is_afro: false,
+                    is_publica: false
+                });
+                setRespostasUsuario({});
+                setStringGabarito('');
+                carregarRanking();
+
+                setFormExpandido(false);
+                lancarNotificacao(`Nota cadastrada com sucesso! NFC Estimada: ${resultado.nfc.toFixed(2)}`);
+
+                setTimeout(() => {
+                    window.scrollTo({top: 0, behavior: 'smooth'});
+                }, 300);
+
+            } catch (err) {
+                console.error(err);
+                lancarNotificacao(err.message, "erro");
+            } finally {
+                setCarregando(false);
+            }
+        };
+
+        const copiarMarkdown = () => {
+            if (!ultimoEnvio) return;
+            const cotas = [];
+            if (ultimoEnvio.is_afro) cotas.push("PPI/Afrodescendente");
+            if (ultimoEnvio.is_publica) cotas.push("Escola Pública");
+            const cotasText = cotas.length > 0 ? cotas.join(" + ") : "Ampla Concorrência";
+
+            const md = `### 📊 Meu Desempenho no Vestibular FATEC!\n\n` +
+                `* 🏛️ **Campus:** ${ultimoEnvio.faculdade}\n` +
+                `* 🎓 **Curso:** ${ultimoEnvio.curso} (${ultimoEnvio.periodo})\n` +
+                `* 🎯 **Acertos:** ${ultimoEnvio.acertos}/60\n` +
+                `* ✍️ **Redação (Estimativa):** ${ultimoEnvio.redacao}\n` +
+                `* 🏷️ **Cotas:** ${cotasText}\n` +
+                `* 🚀 **Nota NFC Estimada:** **${ultimoEnvio.nfc.toFixed(2)}**\n` +
+                `* 🔮 **Chance Estimada de Aprovação:** **${ultimoEnvio.probabilidade.toFixed(1)}%**\n\n` +
+                `*Gerado pelo Simulador de Ranking FATEC. Registre sua nota também na thread!*`;
+
+            const inputTemp = document.createElement("textarea");
+            inputTemp.value = md;
+            document.body.appendChild(inputTemp);
+            inputTemp.select();
+            document.execCommand("copy");
+            document.body.removeChild(inputTemp);
+
+            lancarNotificacao("Copiado com sucesso! É só colar na sua rede social favorita.");
+        };
+
+        const campiComNotas = [...new Set(ranking.map(item => item.faculdade))].sort();
+        const cursosComNotas = [...new Set(ranking.map(item => item.curso))].sort();
+
+        const rankingFiltrado = ranking.filter(item => {
+            return (filtroCampus === '' || item.faculdade === filtroCampus) &&
+                (filtroCurso === '' || item.curso === filtroCurso);
+        });
+
+        // Retorna a cor correspondente à chance de aprovação
+        const obterCorClassChance = (prob) => {
+            if (prob >= 75) return {
+                text: "text-emerald-400",
+                bg: "bg-emerald-950/60",
+                border: "border-emerald-500/30",
+                label: "Alta"
+            };
+            if (prob >= 45) return {
+                text: "text-amber-400",
+                bg: "bg-amber-950/60",
+                border: "border-amber-500/30",
+                label: "Média"
+            };
+            return {text: "text-rose-400", bg: "bg-rose-950/60", border: "border-rose-500/30", label: "Baixa"};
+        };
+
+        return (
+            <div className="max-w-7xl mx-auto px-4 py-8 relative">
+
+                {toast && (
+                    <div
+                        className={`fixed top-4 right-4 z-50 p-4 rounded-xl shadow-2xl flex items-center gap-3 border transition-all duration-300 transform translate-y-0 ${
+                            toast.tipo === 'erro'
+                                ? 'bg-rose-950/90 border-rose-500 text-rose-200'
+                                : 'bg-emerald-950/90 border-emerald-500 text-emerald-200'
+                        }`}>
+                        <span className="text-lg">{toast.tipo === 'erro' ? '❌' : '🎉'}</span>
+                        <p className="text-sm font-semibold">{toast.mensagem}</p>
+                    </div>
+                )}
+
+                <header className="text-center mb-6">
+                    <h1 className="text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-amber-400 to-yellow-300 sm:text-5xl">
+                        Ranking de Notas - FATEC
+                    </h1>
+                </header>
+
+                {ultimoEnvio && (
+                    <div
+                        className="mb-8 p-6 bg-gradient-to-r from-emerald-900/20 via-slate-850 to-slate-900 border border-emerald-500/40 rounded-2xl flex flex-col lg:flex-row items-center justify-between gap-6 shadow-xl">
+                        <div className="space-y-2 w-full lg:w-3/5">
+                            <h3 className="text-lg font-bold text-emerald-400 flex items-center gap-2">
+                                <span>🎉</span> Nota Computada com Sucesso!
+                            </h3>
+                            <p className="text-xs text-slate-300">
+                                Sua Nota Final do Candidato (NFC) estimada foi calculada em: <strong
+                                className="text-amber-400 text-sm">{ultimoEnvio.nfc.toFixed(2)}</strong>.
+                            </p>
+                            <div className="bg-slate-900/80 p-3.5 rounded-xl border border-slate-750 space-y-1.5">
+                                <div className="flex justify-between items-center text-xs">
+                                    <span className="text-slate-400 font-semibold uppercase tracking-wider">Chance Estimada de Aprovação</span>
+                                    <span
+                                        className={`font-bold ${obterCorClassChance(ultimoEnvio.probabilidade).text}`}>{ultimoEnvio.probabilidade.toFixed(1)}%</span>
+                                </div>
+                                <div className="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                                    <div
+                                        className={`h-full transition-all duration-1000 ${
+                                            ultimoEnvio.probabilidade >= 75 ? 'bg-emerald-500' : ultimoEnvio.probabilidade >= 45 ? 'bg-amber-500' : 'bg-rose-500'
+                                        }`}
+                                        style={{width: `${ultimoEnvio.probabilidade}%`}}
+                                    ></div>
+                                </div>
+                                <p className="text-[10px] text-slate-500 italic">
+                                    Cálculo baseado na relação de vagas da unidade, concorrência histórica do curso e
+                                    sua classificação atual neste ranking.
+                                </p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={copiarMarkdown}
+                            className="w-full lg:w-auto bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-extrabold px-5 py-3.5 rounded-xl text-xs flex items-center justify-center gap-2 transition shadow-md active:scale-95 shrink-0"
+                        >
+                            <span>Compartilhar</span>
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M24 11.5c0-1.65-1.35-3-3-3-.96 0-1.86.48-2.42 1.24-1.64-1-3.85-1.64-6.27-1.72l1.32-4.15 3.6.77c.05.94.84 1.7 1.79 1.7 1 0 1.8-.8 1.8-1.8S19.5 3 18.5 3c-.76 0-1.42.47-1.7 1.14l-4.04-.86c-.14-.03-.29.04-.35.17L10.8 8.01c-2.45.05-4.69.69-6.35 1.71-.56-.75-1.46-1.22-2.42-1.22-1.65 0-3 1.35-3 3 0 1.23.75 2.28 1.8 2.73-.02.16-.03.33-.03.5 0 3.59 4.1 6.5 9.15 6.5s9.15-2.91 9.15-6.5c0-.17-.01-.34-.03-.5 1.05-.45 1.8-1.5 1.8-2.73z"/>
+                            </svg>
+                        </button>
+                    </div>
+                )}
+
+                {}
+                <div className="flex justify-center mb-8">
+                    <button
+                        onClick={() => setFormExpandido(!formExpandido)}
+                        className="relative inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-red-500 via-amber-500 to-yellow-400 text-slate-950 font-extrabold text-sm shadow-xl transition-all hover:brightness-110 active:scale-95 group"
+                    >
+                        <span
+                            className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-red-500 to-yellow-400 blur-sm opacity-30 group-hover:opacity-50 transition"></span>
+                        <span className="relative flex items-center gap-2">
+                            <span>{formExpandido ? 'Fechar Painel de Inscrição' : 'Simular Meu Desempenho'}</span>
+                            <svg
+                                className={`w-4 h-4 transition-transform duration-300 ${formExpandido ? 'rotate-180' : ''}`}
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </span>
+                    </button>
+                </div>
+
+                {}
+                <div className={`transition-all duration-500 ease-in-out overflow-hidden ${
+                    formExpandido
+                        ? 'max-h-[2500px] opacity-100 mb-8 scale-100'
+                        : 'max-h-0 opacity-0 mb-0 scale-95 pointer-events-none'
+                }`}>
+                    <div
+                        className="grid grid-cols-1 lg:grid-cols-3 gap-6 bg-slate-850 p-6 rounded-3xl border border-slate-800 shadow-2xl">
+
+                        {/* Bloco 1 (Left 1/3): Cadastro de dados */}
+                        <div className="lg:col-span-1 space-y-4 lg:pr-4 lg:border-r lg:border-slate-800/80">
+                            <div className="border-b border-slate-800 pb-3">
+                                <h2 className="text-xl font-extrabold text-amber-400 flex items-center gap-2">Dados</h2>
+                                <p className="text-xs text-slate-400 mt-1">Preencha sua identificação e as notas do
+                                    vestibular.</p>
+                            </div>
+
+                            <form onSubmit={handleSubmit} className="space-y-4">
+                                <div>
+                                    <label className="block text-xs font-semibold uppercase text-slate-400 mb-1">Nome ou
+                                        Nick do Reddit</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={form.nome}
+                                        onChange={e => setForm({...form, nome: e.target.value})}
+                                        className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm focus:outline-none focus:border-amber-400 text-slate-100 transition"
+                                        placeholder="u/seu_nick_reddit"
+                                    />
+                                </div>
+
+                                <TypeAhead
+                                    label="FATEC / Unidade"
+                                    placeholder="Busque o campus..."
+                                    lista={listaCampuses}
+                                    valorSelecionado={form.faculdade}
+                                    aoSelecionar={handleCampusChange}
+                                />
+
+                                <div>
+                                    <label className="block text-xs font-semibold uppercase text-slate-400 mb-1">Período
+                                        de Estudo</label>
+                                    <select
+                                        required
+                                        disabled={!form.faculdade}
+                                        value={form.periodo}
+                                        onChange={e => handlePeriodoChange(e.target.value)}
+                                        className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm focus:outline-none focus:border-amber-400 text-slate-300 disabled:opacity-40 transition"
+                                    >
+                                        <option value="">Selecione...</option>
+                                        {listaPeriodos.map((p, idx) => <option key={idx} value={p}>{p}</option>)}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-semibold uppercase text-slate-400 mb-1">Curso
+                                        Desejado</label>
+                                    <select
+                                        required
+                                        disabled={!form.periodo}
+                                        value={form.curso}
+                                        onChange={e => setForm({...form, curso: e.target.value})}
+                                        className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm focus:outline-none focus:border-amber-400 text-slate-300 disabled:opacity-40 transition"
+                                    >
+                                        <option value="">Selecione...</option>
+                                        {listaCursos.map((c, idx) => <option key={idx} value={c}>{c}</option>)}
+                                    </select>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="block text-xs font-semibold uppercase text-slate-400 mb-1">Redação
+                                            (0-100)</label>
+                                        <input
+                                            type="number" required min="0" max="100" step="0.1" value={form.redacao}
+                                            onChange={e => setForm({...form, redacao: e.target.value})}
+                                            className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm focus:outline-none focus:border-amber-400 text-slate-100 transition"
+                                            placeholder="Sua nota"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-semibold uppercase text-slate-400 mb-1">Acerto
+                                            ENEM % (Opc.)</label>
+                                        <input
+                                            type="number" min="0" max="100" step="0.1" value={form.nota_enem}
+                                            onChange={e => setForm({...form, nota_enem: e.target.value})}
+                                            className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm focus:outline-none focus:border-amber-400 text-slate-100 transition"
+                                            placeholder="0 - 100"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="bg-slate-900/60 p-3 rounded-xl border border-slate-750 space-y-2">
+                                    <label
+                                        className="block text-[11px] font-bold uppercase tracking-wider text-amber-500/95">Cotas
+                                        e Acréscimo (Edital)</label>
+                                    <label
+                                        className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer select-none">
+                                        <input
+                                            type="checkbox" checked={form.is_afro}
+                                            onChange={e => setForm({...form, is_afro: e.target.checked})}
+                                            className="w-4 h-4 rounded bg-slate-950 border-slate-700 text-amber-500 focus:ring-0 focus:ring-offset-0"
+                                        />
+                                        Autodeclarado Afrodescendente (PPI)
+                                    </label>
+                                    <label
+                                        className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer select-none">
+                                        <input
+                                            type="checkbox" checked={form.is_publica}
+                                            onChange={e => setForm({...form, is_publica: e.target.checked})}
+                                            className="w-4 h-4 rounded bg-slate-950 border-slate-700 text-amber-500 focus:ring-0 focus:ring-offset-0"
+                                        />
+                                        Ensino Médio Integral em Escola Pública
+                                    </label>
+                                </div>
+
+                                <button
+                                    type="submit" disabled={carregando}
+                                    className="w-full bg-gradient-to-r from-red-500 via-amber-500 to-yellow-400 hover:brightness-110 font-bold p-3 rounded-xl text-slate-950 text-sm transition shadow-md disabled:opacity-50"
+                                >
+                                    {carregando ? 'Gravando no Sistema...' : 'Enviar para o Ranking'}
+                                </button>
+                                {totalRespondidas < 60 && (
+                                    <p className="text-[10px] text-center text-rose-400 font-semibold mt-1">
+                                        *Preencha o gabarito completo (60 questões) para enviar.
+                                    </p>
+                                )}
+                            </form>
+                        </div>
+
+                        {/* Bloco 2 (Right 2/3): Digitação guiada de gabarito */}
+                        <div className="lg:col-span-2 space-y-4">
+                            <div className="border-b border-slate-800 pb-3">
+                                <h2 className="text-xl font-extrabold text-amber-400 flex items-center gap-2">Respostas</h2>
+                                <p className="text-xs text-slate-400 mt-1">Preencha individualmente (pula automático) ou
+                                    cole o gabarito corrido.</p>
+                            </div>
+
+                            <div className="bg-slate-900 p-4 rounded-xl border border-slate-750">
+                                <input
+                                    type="text"
+                                    value={stringGabarito}
+                                    onChange={handleStringChange}
+                                    className="text-center w-full bg-slate-800 border border-slate-700 rounded-lg p-2.5 font-mono text-amber-400 uppercase tracking-widest text-sm focus:outline-none focus:border-amber-400"
+                                    placeholder="Ex.: ABCDEEED..."
+                                    maxLength={qNumeros.length}
+                                />
+                            </div>
+
+                            {}
+                            <div
+                                className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 gap-2 overflow-y-auto pr-2 custom-scrollbar">
+                                {qNumeros.map((q, idx) => {
+                                    const res = respostasUsuario[q];
+                                    const correto = gabarito[q];
+                                    let classFeedback = "border-slate-600 focus:border-amber-400 focus:ring-2 focus:ring-amber-500 bg-slate-800 text-amber-400";
+
+                                    if (res) {
+                                        if (res.toUpperCase() === correto.toUpperCase()) {
+                                            classFeedback = "border-emerald-500 bg-emerald-950/40 text-emerald-400 focus:ring-2 focus:ring-emerald-500";
+                                        } else {
+                                            classFeedback = "border-rose-500 bg-rose-950/40 text-rose-400 focus:ring-2 focus:ring-rose-500";
+                                        }
+                                    }
+
+                                    return (
+                                        <div key={q}
+                                             className="flex items-center justify-between p-1 bg-slate-900 rounded-lg border border-slate-750 transition-colors">
+                                            <span
+                                                className="text-xs font-mono text-slate-500 pl-1 font-bold">Q{q}:</span>
+                                            <input
+                                                ref={el => inputsRef.current[q] = el}
+                                                type="text"
+                                                maxLength="1"
+                                                value={res || ''}
+                                                onKeyDown={(e) => handleKeyDown(e, q, idx)}
+                                                onChange={(e) => handleInputChange(q, e.target.value, idx)}
+                                                className={`w-7 h-7 text-center font-bold text-sm rounded uppercase focus:outline-none ${classFeedback}`}
+                                                placeholder="-"
+                                            />
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                {}
+                {/* Block 3: Consolidated Ranking Table */}
+                <div className="bg-slate-800 rounded-2xl border border-slate-750 overflow-hidden shadow-2xl w-full">
+                    <div
+                        className="p-5 bg-slate-850 border-b border-slate-750 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div>
+                            <h2 className="text-xl font-bold text-slate-200">Resultados Estimados</h2>
+                            <p className="text-xs text-slate-400 mt-1">Veja as melhores pontuações registradas e a sua
+                                classificação.</p>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                            <select
+                                value={filtroCampus}
+                                onChange={e => setFiltroCampus(e.target.value)}
+                                className="bg-slate-900 border border-slate-700 rounded-lg text-xs p-2 text-slate-300 focus:outline-none focus:border-amber-400"
+                            >
+                                <option value="">Filtrar por Campus...</option>
+                                {campiComNotas.map((c, i) => <option key={i} value={c}>{c}</option>)}
+                            </select>
+                            <select
+                                value={filtroCurso}
+                                onChange={e => setFiltroCurso(e.target.value)}
+                                className="bg-slate-900 border border-slate-700 rounded-lg text-xs p-2 text-slate-300 focus:outline-none focus:border-amber-400"
+                            >
+                                <option value="">Filtrar por Curso...</option>
+                                {cursosComNotas.map((cur, i) => <option key={i} value={cur}>{cur}</option>)}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                            <tr className="bg-slate-900 text-slate-400 text-xs uppercase tracking-wider">
+                                <th className="py-3 px-4 text-center w-12">Pos</th>
+                                <th className="py-3 px-4">Candidato</th>
+                                <th className="py-3 px-4">Curso / Campus</th>
+                                <th className="py-3 px-4 text-center">Acertos</th>
+                                <th className="py-3 px-4 text-center">Redação</th>
+                                <th className="py-3 px-4 text-center text-amber-400 font-extrabold">Nota NFC</th>
+                                <th className="py-3 px-4 text-center">Aprovação (Est.)</th>
+                            </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-700 text-sm">
+                            {rankingFiltrado.length === 0 ? (
+                                <tr>
+                                    <td colSpan="7" className="py-8 text-center text-slate-500">Nenhum resultado
+                                        corresponde aos filtros selecionados.
+                                    </td>
+                                </tr>
+                            ) : (
+                                rankingFiltrado.map((item, index) => {
+                                    const chance = obterCorClassChance(item.probabilidade);
+                                    return (
+                                        <tr key={index} className="hover:bg-slate-750/50 transition-colors">
+                                            <td className="py-3.5 px-4 text-center font-bold text-slate-400">{index + 1}º</td>
+                                            <td className="py-3.5 px-4 font-semibold text-slate-200">{item.nome}</td>
+                                            <td className="py-3.5 px-4 leading-tight">
+                                                <div className="text-slate-300 font-medium text-xs">{item.curso}</div>
+                                                <div
+                                                    className="text-slate-400 text-[10px] mt-0.5">{item.faculdade} • <span
+                                                    className="text-amber-500/80 font-mono">{item.periodo}</span></div>
+                                            </td>
+                                            <td className="py-3.5 px-4 text-center text-slate-300 font-mono">{item.acertos}</td>
+                                            <td className="py-3.5 px-4 text-center text-slate-300 font-mono">{item.redacao}</td>
+                                            <td className="py-3.5 px-4 text-center font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-red-400 text-base">{item.nfc.toFixed(2)}</td>
+                                            <td className="py-3.5 px-4 text-center">
+                                                <span
+                                                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border ${chance.bg} ${chance.text} ${chance.border}`}>
+                                                    <span className={`w-1.5 h-1.5 rounded-full ${
+                                                        item.probabilidade >= 75 ? 'bg-emerald-400' : item.probabilidade >= 45 ? 'bg-amber-400' : 'bg-rose-400'
+                                                    }`}></span>
+                                                    {chance.label} ({item.probabilidade.toFixed(1)}%)
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App/>);
+</script>
+<style>
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #1e293b;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #475569;
+        border-radius: 3px;
+    }
+</style>
+</body>
+</html>
