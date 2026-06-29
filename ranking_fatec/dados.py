@@ -725,22 +725,22 @@ OFERTAS_ESTRUTURADAS: OfertasEstruturadas = {
     },
     "FATEC Praia Grande": {
         PeriodoEnum.MANHA: [
-            OfertaDTO("Comércio Exterior", 31, None, None),
-            OfertaDTO("Gestão Empresarial", 33, None, None),
-            OfertaDTO("Processos Químicos", 37, None, None),
+            OfertaDTO("Comércio Exterior", 31, None, 2.23),
+            OfertaDTO("Gestão Empresarial", 33, None, 1.00),
+            OfertaDTO("Processos Químicos", 37, None, 1.08),
         ],
         PeriodoEnum.TARDE: [
-            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 32, None, None),
-            OfertaDTO("Desenvolvimento de Software Multiplataforma", 32, None, None),
+            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 32, None, 3),
+            OfertaDTO("Desenvolvimento de Software Multiplataforma", 32, None, 1.66),
         ],
         PeriodoEnum.NOITE: [
-            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 31, None, None),
-            OfertaDTO("Comércio Exterior", 32, None, None),
-            OfertaDTO("Gestão Empresarial", 33, None, None),
-            OfertaDTO("Processos Químicos", 38, None, None),
+            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 31, None, 8.61),
+            OfertaDTO("Comércio Exterior", 32, None, 4.38),
+            OfertaDTO("Gestão Empresarial", 33, None, 1.76),
+            OfertaDTO("Processos Químicos", 38, None, 1.32),
         ],
         PeriodoEnum.EAD: [
-            OfertaDTO("Gestão Empresarial", 31, None, None),
+            OfertaDTO("Gestão Empresarial", 31, None, 4.42),
         ],
     },
     "FATEC Presidente Prudente": {
