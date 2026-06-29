@@ -98,8 +98,10 @@
         const [buscandoUser, setBuscandoUser] = useState(false);
         const [ultimoEnvio, setUltimoEnvio] = useState(null);
 
+        // Estados para o gerenciamento de filtros da Tabela
         const [filtroCampus, setFiltroCampus] = useState('');
         const [filtroCurso, setFiltroCurso] = useState('');
+        const [filtroPeriodo, setFiltroPeriodo] = useState('');
 
         const inputsRef = useRef({});
 
@@ -374,7 +376,7 @@
                 `* 🏷️ **Cotas:** ${cotasText}\n` +
                 `* 🚀 **Nota NFC Estimada:** **${ultimoEnvio.nfc.toFixed(2)}**\n` +
                 `* 🔮 **Chance Estimada de Aprovação:** **${chanceTexto}**\n\n` +
-                `*Gerado pelo Simulador de Ranking FATEC. Registre sua nota também!*` +
+                `*Gerado pelo Simulador de Ranking FATEC. Registre sua nota também!*\n` +
                 `*https://wesleyfralima.dev.br/apps/ranking-fatec/*`;
 
             const inputTemp = document.createElement("textarea");
@@ -387,12 +389,16 @@
             lancarNotificacao("Copiado com sucesso! É só colar na sua rede social favorita.");
         };
 
+        // Geração dinâmica de opções exclusivas com base nos dados presentes na tabela
         const campiComNotas = [...new Set(ranking.map(item => item.faculdade))].sort();
         const cursosComNotas = [...new Set(ranking.map(item => item.curso))].sort();
+        const periodosComNotas = [...new Set(ranking.map(item => item.periodo))].sort();
 
+        // Lógica de encadeamento dos 3 filtros lógicos aplicados em cascata
         const rankingFiltrado = ranking.filter(item => {
             return (filtroCampus === '' || item.faculdade === filtroCampus) &&
-                (filtroCurso === '' || item.curso === filtroCurso);
+                (filtroCurso === '' || item.curso === filtroCurso) &&
+                (filtroPeriodo === '' || item.periodo === filtroPeriodo);
         });
 
         const obterCorClassChance = (prob) => {
@@ -710,26 +716,37 @@
                 {/* Block 3: Consolidated Ranking Table */}
                 <div className="bg-slate-800 rounded-2xl border border-slate-750 overflow-hidden shadow-2xl w-full">
                     <div
-                        className="p-5 bg-slate-850 border-b border-slate-750 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        className="p-5 bg-slate-850 border-b border-slate-750 flex flex-col md:flex-row items-center justify-between gap-4">
                         <div>
                             <h2 className="text-xl font-bold text-slate-200">Resultados Estimados</h2>
                             <p className="text-xs text-slate-400 mt-1">Veja as melhores pontuações registradas e a sua
                                 classificação.</p>
                         </div>
 
-                        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                        {/* Grade de 3 filtros lado a lado em telas médias/grandes */}
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full md:w-auto">
                             <select
                                 value={filtroCampus}
                                 onChange={e => setFiltroCampus(e.target.value)}
-                                className="bg-slate-900 border border-slate-700 rounded-lg text-xs p-2 text-slate-300 focus:outline-none focus:border-amber-400"
+                                className="bg-slate-900 border border-slate-700 rounded-lg text-xs p-2 text-slate-300 focus:outline-none focus:border-amber-400 w-full"
                             >
                                 <option value="">Filtrar por Campus...</option>
                                 {campiComNotas.map((c, i) => <option key={i} value={c}>{c}</option>)}
                             </select>
+
+                            <select
+                                value={filtroPeriodo}
+                                onChange={e => setFiltroPeriodo(e.target.value)}
+                                className="bg-slate-900 border border-slate-700 rounded-lg text-xs p-2 text-slate-300 focus:outline-none focus:border-amber-400 w-full"
+                            >
+                                <option value="">Filtrar por Período...</option>
+                                {periodosComNotas.map((p, i) => <option key={i} value={p}>{p}</option>)}
+                            </select>
+
                             <select
                                 value={filtroCurso}
                                 onChange={e => setFiltroCurso(e.target.value)}
-                                className="bg-slate-900 border border-slate-700 rounded-lg text-xs p-2 text-slate-300 focus:outline-none focus:border-amber-400"
+                                className="bg-slate-900 border border-slate-700 rounded-lg text-xs p-2 text-slate-300 focus:outline-none focus:border-amber-400 w-full"
                             >
                                 <option value="">Filtrar por Curso...</option>
                                 {cursosComNotas.map((cur, i) => <option key={i} value={cur}>{cur}</option>)}
