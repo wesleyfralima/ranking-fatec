@@ -6,6 +6,7 @@ from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from ranking_fatec.dados import GABARITO
@@ -130,7 +131,7 @@ def calcular_probabilidade_aprovacao(
     else:
         # Se não houver nota de corte disponível,
         # usa a NFC ponderada de forma mais branda
-        score += (nfc - 650) * 0.02
+        score += (nfc - 60) * 0.02
 
     # --------------------------------------
     # 3) Concorrência (Peso aumentado no cálculo)
@@ -287,23 +288,34 @@ def obter_cursos(campus: str, periodo: str, db: Session = Depends(get_db)):
 
 @app.get("/api/ranking")
 def obter_ranking(db: Session = Depends(get_db)):
-    candidatos = (
-        db.query(Candidato)
+    data = (
+        db.query(Candidato, Oferta)
+        .join(
+            Oferta,
+            and_(
+                Candidato.faculdade == Oferta.campus,
+                Candidato.periodo == Oferta.periodo,
+                Candidato.curso == Oferta.curso,
+            ),
+        )
         .order_by(Candidato.nfc.desc(), Candidato.acertos.desc())
         .all()
     )
     return [
         {
-            "nome": c.nome,
-            "faculdade": c.faculdade,
-            "curso": c.curso,
-            "periodo": c.periodo,
-            "acertos": c.acertos,
-            "redacao": c.redacao,
-            "nfc": c.nfc,
-            "probabilidade": c.probabilidade,
+            "nome": candidato.nome,
+            "faculdade": candidato.faculdade,
+            "curso": candidato.curso,
+            "periodo": candidato.periodo,
+            "acertos": candidato.acertos,
+            "redacao": candidato.redacao,
+            "nfc": candidato.nfc,
+            "probabilidade": candidato.probabilidade,
+            "vagas": oferta.vagas,
+            "nota_corte": oferta.nota_corte_historica,
+            "candidato_vaga": oferta.cand_vaga_historico,
         }
-        for c in candidatos
+        for candidato, oferta in data
     ]
 
 
