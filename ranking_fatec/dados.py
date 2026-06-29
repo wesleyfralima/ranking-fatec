@@ -454,19 +454,19 @@ OFERTAS_ESTRUTURADAS: OfertasEstruturadas = {
     },
     "FATEC Itaquaquecetuba": {
         PeriodoEnum.MANHA: [
-            OfertaDTO("Gestão Comercial", 34, None, None),
-            OfertaDTO("Gestão da Tecnologia da Informação", 32, None, None),
-            OfertaDTO("Secretariado", 30, None, None),
+            OfertaDTO("Gestão Comercial", 34, None, 0.44),
+            OfertaDTO("Gestão da Tecnologia da Informação", 32, None, 2.22),
+            OfertaDTO("Secretariado", 30, None, 0.33),
         ],
         PeriodoEnum.TARDE: [
-            OfertaDTO("Gestão de Comércio Eletrônico", 38, None, None),
+            OfertaDTO("Gestão de Comércio Eletrônico", 38, None, 0.08),
         ],
         PeriodoEnum.NOITE: [
-            OfertaDTO("Gestão Comercial", 33, None, None),
-            OfertaDTO("Secretariado", 31, None, None),
+            OfertaDTO("Gestão Comercial", 33, None, 1.88),
+            OfertaDTO("Secretariado", 31, None, 0.84),
         ],
         PeriodoEnum.EAD: [
-            OfertaDTO("Gestão Empresarial", 31, None, None),
+            OfertaDTO("Gestão Empresarial", 31, None, 3.9),
         ],
     },
     "FATEC Itatiba": {
