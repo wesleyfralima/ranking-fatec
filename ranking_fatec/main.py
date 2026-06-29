@@ -95,7 +95,7 @@ def calcular_probabilidade_aprovacao(
     nfc: float,
     vagas: int,
     rank: int,
-    cv: float,
+    cv: float | None,
     acertos: int,
     redacao: float,
     nota_corte: float | None = None,
@@ -105,6 +105,7 @@ def calcular_probabilidade_aprovacao(
 
     Regras aplicadas:
         - Redação zero ou zero acertos nas objetivas descarta o candidato (0%).
+        - Relação C/V menor ou igual a 1 é aprovação certa (quando não desclassificado).
         - Ranking atenuado devido à amostragem baixa.
         - Foco principal na diferença da nota de corte histórica e concorrência.
     """
@@ -117,27 +118,32 @@ def calcular_probabilidade_aprovacao(
 
     score: float = 0.0
 
+    if cv is None:
+        cv = 3.5
+
+    if cv <= 1:
+        return 100
+
     # --------------------------------------
     # 2) Nota de Corte (Maior carga de cálculo)
     # --------------------------------------
     if nota_corte is not None:
         diff = nfc - nota_corte
 
-        # Cursos muito concorridos exigem uma margem de segurança maior
-        fator_concorrencia = 1.0 / (1.0 + math.log1p(max(cv - 1, 0)))
-
-        # Aumentamos o peso do impacto da nota de corte (antigo era 0.09)
-        score += diff * 0.25 * fator_concorrencia
+        # Se a nota é maior que o corte histórico, o ganho tem que ser limpo.
+        # Peso 0.40 significa que ficar 5 pontos acima
+        # do corte dá +2,0 no score (chance de ~88%)
+        score += diff * 0.40
     else:
         # Se não houver nota de corte disponível,
         # usa a NFC ponderada de forma mais branda
-        score += (nfc - 60) * 0.02
+        score += (nfc - 60) * 0.25
 
     # --------------------------------------
     # 3) Concorrência (Peso aumentado no cálculo)
     # --------------------------------------
     # Penaliza e equilibra o score baseando-se no tamanho da disputa do curso
-    score -= math.log1p(cv) * 0.60
+    score -= math.log1p(cv) * 0.30
 
     # --------------------------------------
     # 4) Ranking (Peso atenuado por conta da amostragem baixa)
