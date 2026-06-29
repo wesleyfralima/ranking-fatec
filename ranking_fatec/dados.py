@@ -189,7 +189,7 @@ OFERTAS_ESTRUTURADAS: OfertasEstruturadas = {
             OfertaDTO("Comércio Exterior", 32, 69.306, 4.78),
             OfertaDTO("Design de Mídias Digitais", 32, 68.554, 4.75),
             OfertaDTO("Gestão de Comércio Eletrônico", 38, 20.600, 0.92),
-            OfertaDTO("Gestão de Recursos Humanos", 33, None, 5.33),
+            OfertaDTO("Gestão de Recursos Humanos", 33, 65.266, 5.33),
             OfertaDTO("Transporte Terrestre", 40, 47.666, 0.85),
         ],
         PeriodoEnum.EAD: [
@@ -1157,7 +1157,7 @@ OFERTAS_ESTRUTURADAS: OfertasEstruturadas = {
 
 
 # Inicializa a lista plana esperada pelo backend para persistência de dados
-DADOS_OFERTAS_INICIAIS: list[tuple[str, str, str, int, float, float]] = []
+DADOS_OFERTAS_INICIAIS: list[tuple[str, PeriodoEnum, str, int, float, float]] = []
 
 for campus, periodos in OFERTAS_ESTRUTURADAS.items():
     for periodo, ofertas in periodos.items():
