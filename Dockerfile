@@ -6,14 +6,15 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
+RUN python -m pip install --upgrade pip
+
 RUN pip install poetry
 
 COPY pyproject.toml poetry.lock README.md ./
-
-RUN poetry install
-
 COPY . .
 RUN chmod +x boot.sh
+
+RUN poetry install --only main
 
 RUN mkdir -p /app/data
 
