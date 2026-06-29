@@ -823,19 +823,19 @@ OFERTAS_ESTRUTURADAS: OfertasEstruturadas = {
     },
     "FATEC São Caetano do Sul": {
         PeriodoEnum.MANHA: [
-            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 31, None, None),
-            OfertaDTO("Segurança da Informação", 31, None, None),
+            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 31, None, 4.77),
+            OfertaDTO("Segurança da Informação", 31, None, 1.87),
         ],
         PeriodoEnum.TARDE: [
-            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 31, None, None),
-            OfertaDTO("Comércio Exterior", 33, None, None),
+            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 31, None, 1.9),
+            OfertaDTO("Comércio Exterior", 33, None, 1.06),
         ],
         PeriodoEnum.NOITE: [
-            OfertaDTO("Jogos Digitais", 31, None, None),
-            OfertaDTO("Segurança da Informação", 31, None, None),
+            OfertaDTO("Jogos Digitais", 31, None, 2.35),
+            OfertaDTO("Segurança da Informação", 31, None, 5.61),
         ],
         PeriodoEnum.EAD: [
-            OfertaDTO("Gestão Empresarial", 33, None, None),
+            OfertaDTO("Gestão Empresarial", 33, None, 2.88),
         ],
     },
     "FATEC São Carlos": {
