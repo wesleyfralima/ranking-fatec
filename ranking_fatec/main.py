@@ -94,7 +94,7 @@ def sigmoid(x: float) -> float:
 def calcular_probabilidade_aprovacao(
     nfc: float,
     vagas: int,
-    rank: int,
+    rank: int | None,
     cv: float | None,
     acertos: int,
     redacao: float,
@@ -105,9 +105,9 @@ def calcular_probabilidade_aprovacao(
 
     Regras aplicadas:
         - Redação zero ou zero acertos nas objetivas descarta o candidato (0%).
-        - Relação C/V menor ou igual a 1 é aprovação certa (quando não desclassificado).
-        - Ranking atenuado devido à amostragem baixa.
-        - Foco principal na diferença da nota de corte histórica e concorrência.
+        - Relação C/V menor ou igual a 1 é aprovação certa (100%).
+        - Foco prioritário na diferença da Nota de Corte e na Concorrência (C/V).
+        - Ranking opcional e isolado para quando a amostragem for alta.
     """
 
     # --------------------------------------
@@ -116,53 +116,57 @@ def calcular_probabilidade_aprovacao(
     if redacao == 0.0 or acertos == 0:
         return 0.0
 
-    score: float = 0.0
-
+    # Tratamento e priorização da relação Candidato/Vaga (C/V)
     if cv is None:
         cv = 3.5
 
-    if cv <= 1:
-        return 100
+    # --------------------------------------
+    # 2) Aprovação certa: relação C/V menor ou igual a 1
+    # --------------------------------------
+    if cv <= 1.0:
+        return 100.0
+
+    score: float = 0.0
 
     # --------------------------------------
-    # 2) Nota de Corte (Maior carga de cálculo)
+    # 3) Nota de Corte (Prioridade máxima no cálculo)
     # --------------------------------------
     if nota_corte is not None:
-        # Considera que a prova foi levemente mais
-        # difícil do que a de 1º semestre de 2026
-        nota_corte *= 0.965
-        diff = nfc - nota_corte
+        # Ponderação histórica: Considera que a prova foi
+        # levemente mais difícil do que a do 1º semestre de 2026
+        nota_corte_ajustada = nota_corte * 0.965
+        diff = nfc - nota_corte_ajustada
 
-        # Se a nota é maior que o corte histórico, o ganho tem que ser limpo.
-        # Peso 0.40 significa que ficar 5 pontos acima
-        # do corte dá +2,0 no score (chance de ~88%)
+        # Peso robusto para a diferença de notas
+        # Ficar 5 pontos acima do corte dá +2,0 no score (chance de ~88% antes do C/V)
         score += diff * 0.40
     else:
-        # Se não houver nota de corte disponível,
-        # usa a NFC ponderada de forma mais branda
+        # Fallback caso a nota de corte histórica não exista
         score += (nfc - 60) * 0.25
 
     # --------------------------------------
-    # 3) Concorrência (Peso aumentado no cálculo)
+    # 4) Concorrência (Penalidade logística controlada)
     # --------------------------------------
-    # Penaliza e equilibra o score baseando-se no tamanho da disputa do curso
+    # Equilibra o score baseando-se no tamanho real da disputa do curso
     score -= math.log1p(cv) * 0.30
 
     # --------------------------------------
-    # 4) Ranking (Peso atenuado por conta da amostragem baixa)
-    # --------------------------------------
-    if rank > 0:
+    # 5) Ranking Opcional (Modo Amostragem Alta)
+    # -------------------------------------
+    # Só interfere se explicitamente ativado e se o rank for válido
+    if rank is not None and rank > 0:
         posicao_relativa = (vagas - rank) / max(vagas, 1)
-        # Reduzido drasticamente de 2,8 para 0,50 para
-        # não distorcer o cálculo nesta fase amostral
+        # Mantido um peso equilibrado de 0,50
+        # para somar/subtrair do score principal
         score += 0.50 * posicao_relativa
 
     # --------------------------------------
-    # 5) Conversão para Porcentagem
+    # 6) Conversão para Porcentagem
     # --------------------------------------
     prob = sigmoid(score)
 
-    # Mantemos uma margem para quem não foi desclassificado direto
+    # Mantém a margem de segurança entre
+    # 1% e 99.9% para candidatos ativos
     porcentagem = min(max(prob * 100, 1.0), 99.9)
 
     return round(porcentagem, 2)
@@ -211,7 +215,7 @@ def recalcular_probabilidades(
         candidato.probabilidade = calcular_probabilidade_aprovacao(
             nfc=candidato.nfc,
             vagas=oferta.vagas,
-            rank=rank,
+            rank=None,
             cv=oferta.cand_vaga_historico,
             acertos=candidato.acertos,
             redacao=candidato.redacao,
@@ -226,6 +230,7 @@ def recalcular_todos_os_candidatos_do_banco(db: Session) -> dict:
     """
     try:
         from ranking_fatec.cli import recalcular_todas_as_probabilidades
+
         contador_grupos = recalcular_todas_as_probabilidades(db)
 
         return {
