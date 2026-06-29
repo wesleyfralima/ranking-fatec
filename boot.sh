@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#set -e
+set -e
 
 echo "========================================"
 echo "Aplicando migrations..."
@@ -18,6 +18,6 @@ echo "========================================"
 echo "Iniciando aplicação..."
 echo "========================================"
 
-#exec uvicorn ranking_fatec.main:app \
-#    --host 127.0.0.1 \
-#    --port 8002
+exec uvicorn ranking_fatec.main:app \
+    --host 127.0.0.1 \
+    --port 8002

@@ -10,7 +10,7 @@ RUN pip install poetry
 
 COPY pyproject.toml poetry.lock ./
 
-RUN poetry install --only main --no-root
+RUN poetry install --only main
 
 COPY . .
 RUN chmod +x boot.sh
