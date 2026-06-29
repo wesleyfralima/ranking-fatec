@@ -416,17 +416,17 @@ OFERTAS_ESTRUTURADAS: OfertasEstruturadas = {
     },
     "FATEC Indaiatuba": {
         PeriodoEnum.MANHA: [
-            OfertaDTO("Desenvolvimento de Software Multiplataforma", 35, None, None),
-            OfertaDTO("Gestão de Serviços", 38, None, None),
-            OfertaDTO("Logística Aeroportuária", 34, None, None),
+            OfertaDTO("Desenvolvimento de Software Multiplataforma", 35, None, 1.66),
+            OfertaDTO("Gestão de Serviços", 38, None, 1.42),
+            OfertaDTO("Logística Aeroportuária", 34, None, 1.53),
         ],
         PeriodoEnum.TARDE: [
-            OfertaDTO("Gestão Empresarial", 39, None, None),
+            OfertaDTO("Gestão Empresarial", 39, None, 1.44),
         ],
         PeriodoEnum.NOITE: [
-            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 31, None, None),
-            OfertaDTO("Comércio Exterior", 33, None, None),
-            OfertaDTO("Gestão Empresarial", 31, None, None),
+            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 31, None, 6.71),
+            OfertaDTO("Comércio Exterior", 33, None, 2.27),
+            OfertaDTO("Gestão Empresarial", 31, None, 4.06),
         ],
     },
     "FATEC Itapetininga": {
@@ -798,13 +798,13 @@ OFERTAS_ESTRUTURADAS: OfertasEstruturadas = {
     },
     "FATEC Santo André": {
         PeriodoEnum.MANHA: [
-            OfertaDTO("Mecânica Automobilística", 33, None, None),
-            OfertaDTO("Mecatrônica Industrial", 34, None, None),
-            OfertaDTO("Sistemas Embarcados", 35, None, None),
+            OfertaDTO("Mecânica Automobilística", 33, None, 1.36),
+            OfertaDTO("Mecatrônica Industrial", 34, None, 2.18),
+            OfertaDTO("Sistemas Embarcados", 35, None, 0.83),
         ],
         PeriodoEnum.NOITE: [
-            OfertaDTO("Eletrônica Automotiva", 30, None, None),
-            OfertaDTO("Mecânica Automobilística", 32, None, None),
+            OfertaDTO("Eletrônica Automotiva", 30, None, 3.37),
+            OfertaDTO("Mecânica Automobilística", 32, None, 4.5),
         ],
     },
     "FATEC São Bernardo do Campo": {
@@ -955,15 +955,15 @@ OFERTAS_ESTRUTURADAS: OfertasEstruturadas = {
     },
     "FATEC Sebrae": {
         PeriodoEnum.MANHA: [
-            OfertaDTO("Gestão de Negócios e Inovação", 26, None, None),
-            OfertaDTO("Marketing", 26, None, None),
+            OfertaDTO("Gestão de Negócios e Inovação", 26, None, 1.54),
+            OfertaDTO("Marketing", 26, None, 4.15),
         ],
         PeriodoEnum.TARDE: [
-            OfertaDTO("Ciência de Dados para Negócios", 26, None, None),
+            OfertaDTO("Ciência de Dados para Negócios", 26, None, 2.31),
         ],
         PeriodoEnum.NOITE: [
-            OfertaDTO("Gestão de Negócios e Inovação", 26, None, None),
-            OfertaDTO("Marketing", 26, None, None),
+            OfertaDTO("Gestão de Negócios e Inovação", 26, None, 3.65),
+            OfertaDTO("Marketing", 26, None, 8.73),
         ],
     },
     "FATEC Tatuapé": {
@@ -1096,8 +1096,8 @@ OFERTAS_ESTRUTURADAS: OfertasEstruturadas = {
     },
     "FATEC Suzano": {
         PeriodoEnum.NOITE: [
-            OfertaDTO("Gestão da Produção Industrial", 34, None, None),
-            OfertaDTO("Redes de Computadores", 32, None, None),
+            OfertaDTO("Gestão da Produção Industrial", 34, None, 2.85),
+            OfertaDTO("Redes de Computadores", 32, None, 3.03),
         ],
     },
     "FATEC Taquaritinga": {
