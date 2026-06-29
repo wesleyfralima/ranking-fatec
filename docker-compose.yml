@@ -1,10 +1,10 @@
 services:
 
-  ranking:
+  mvp:
 
     build: .
 
-    container_name: ranking-fatec-mvp
+    container_name: ranking-fatec
 
     restart: unless-stopped
 
