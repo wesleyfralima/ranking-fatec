@@ -16,7 +16,7 @@ from ranking_fatec.models import Candidato, Oferta
 # (fallback amigável se o Alembic ainda não rodou)
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Ranking FATEC Oficial")
+app = FastAPI(title="Ranking FATEC", root_path="/apps/ranking-fatec")
 
 app.add_middleware(
     CORSMiddleware,

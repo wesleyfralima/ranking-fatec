@@ -1,7 +1,6 @@
 name: ranking-fatec
 
 services:
-
   mvp:
     build: .
     image: cms/ranking-fatec:1.0.0
@@ -9,6 +8,8 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:8002:8000"
+    environment:
+      - DATABASE_URL=sqlite:////app/data/ranking.db
     volumes:
       - ./data:/app/data
     networks:

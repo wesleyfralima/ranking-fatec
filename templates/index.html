@@ -111,7 +111,7 @@
 
         const carregarRanking = async () => {
             try {
-                const res = await fetch('/api/ranking');
+                const res = await fetch('/apps/ranking-fatec/api/ranking');
                 setRanking(await res.json());
             } catch (e) {
                 console.error(e);
@@ -120,7 +120,7 @@
 
         const carregarGabarito = async () => {
             try {
-                const res = await fetch('/api/gabarito');
+                const res = await fetch('/apps/ranking-fatec/api/gabarito');
                 setGabarito(await res.json());
             } catch (e) {
                 console.error(e);
@@ -129,7 +129,7 @@
 
         const carregarCampuses = async () => {
             try {
-                const res = await fetch('/api/campuses');
+                const res = await fetch('/apps/ranking-fatec/api/campuses');
                 setListaCampuses(await res.json());
             } catch (e) {
                 console.error(e);
@@ -149,7 +149,7 @@
             if (!campus) return;
 
             try {
-                const res = await fetch(`/api/periods?campus=${encodeURIComponent(campus)}`);
+                const res = await fetch(`/apps/ranking-fatec/api/periods?campus=${encodeURIComponent(campus)}`);
                 setListaPeriodos(await res.json());
             } catch (e) {
                 console.error(e);
@@ -162,7 +162,7 @@
             if (!periodo) return;
 
             try {
-                const res = await fetch(`/api/courses?campus=${encodeURIComponent(form.faculdade)}&periodo=${encodeURIComponent(periodo)}`);
+                const res = await fetch(`/apps/ranking-fatec/api/courses?campus=${encodeURIComponent(form.faculdade)}&periodo=${encodeURIComponent(periodo)}`);
                 setListaCursos(await res.json());
             } catch (e) {
                 console.error(e);
@@ -225,7 +225,7 @@
                     respostas: respostasUsuario
                 };
 
-                const response = await fetch('/api/ranking', {
+                const response = await fetch('/apps/ranking-fatec/api/ranking', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(payload)
