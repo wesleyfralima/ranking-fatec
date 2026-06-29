@@ -134,12 +134,18 @@ def calcular_probabilidade_aprovacao(
     if nota_corte is not None:
         # Ponderação histórica: Considera que a prova foi
         # levemente mais difícil do que a do 1º semestre de 2026
+        # Ex: 84,00 * 0.965 = 81,06
         nota_corte_ajustada = nota_corte * 0.965
         diff = nfc - nota_corte_ajustada
 
-        # Peso robusto para a diferença de notas
-        # Ficar 5 pontos acima do corte dá +2,0 no score (chance de ~88% antes do C/V)
-        score += diff * 0.40
+        if diff >= 0:
+            # Acumula pontos normalmente para quem passou do corte histórico
+            score += diff * 0.45
+        else:
+            # PENALIZAÇÃO EM DOBRO: Se está abaixo do corte ajustado,
+            # o score despenca mais rápido para
+            # refletir a realidade dos cortes.
+            score += diff * 0.90
     else:
         # Fallback caso a nota de corte histórica não exista
         score += (nfc - 60) * 0.25
