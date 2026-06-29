@@ -295,6 +295,10 @@
             if (ultimoEnvio.is_publica) cotas.push("Escola Pública");
             const cotasText = cotas.length > 0 ? cotas.join(" + ") : "Ampla Concorrência";
 
+            const chanceTexto = ultimoEnvio.probabilidade === 0
+                ? "Desclassificado"
+                : `${ultimoEnvio.probabilidade.toFixed(1)}%`;
+
             const md = `### 📊 Meu Desempenho no Vestibular FATEC!\n\n` +
                 `* 🏛️ **Campus:** ${ultimoEnvio.faculdade}\n` +
                 `* 🎓 **Curso:** ${ultimoEnvio.curso} (${ultimoEnvio.periodo})\n` +
@@ -302,8 +306,9 @@
                 `* ✍️ **Redação (Estimativa):** ${ultimoEnvio.redacao}\n` +
                 `* 🏷️ **Cotas:** ${cotasText}\n` +
                 `* 🚀 **Nota NFC Estimada:** **${ultimoEnvio.nfc.toFixed(2)}**\n` +
-                `* 🔮 **Chance Estimada de Aprovação:** **${ultimoEnvio.probabilidade.toFixed(1)}%**\n\n` +
-                `*Gerado pelo Simulador de Ranking FATEC. Registre sua nota também na thread!*`;
+                `* 🔮 **Chance Estimada de Aprovação:** **${chanceTexto}**\n\n` +
+                `*Gerado pelo Simulador de Ranking FATEC. Registre sua nota também!*` +
+                `*https://wesleyfralima.dev.br/apps/ranking-fatec/*`;
 
             const inputTemp = document.createElement("textarea");
             inputTemp.value = md;
@@ -375,14 +380,16 @@
                                 <div className="flex justify-between items-center text-xs">
                                     <span className="text-slate-400 font-semibold uppercase tracking-wider">Chance Estimada de Aprovação</span>
                                     <span
-                                        className={`font-bold ${obterCorClassChance(ultimoEnvio.probabilidade).text}`}>{ultimoEnvio.probabilidade.toFixed(1)}%</span>
+                                        className={`font-bold ${ultimoEnvio.probabilidade === 0 ? 'text-rose-400' : obterCorClassChance(ultimoEnvio.probabilidade).text}`}>
+                                        {ultimoEnvio.probabilidade === 0 ? 'Desclassificado' : `${ultimoEnvio.probabilidade.toFixed(1)}%`}
+                                    </span>
                                 </div>
                                 <div className="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
                                     <div
                                         className={`h-full transition-all duration-1000 ${
-                                            ultimoEnvio.probabilidade >= 75 ? 'bg-emerald-500' : ultimoEnvio.probabilidade >= 45 ? 'bg-amber-500' : 'bg-rose-500'
+                                            ultimoEnvio.probabilidade === 0 ? 'bg-rose-700' : ultimoEnvio.probabilidade >= 75 ? 'bg-emerald-500' : ultimoEnvio.probabilidade >= 45 ? 'bg-amber-500' : 'bg-rose-500'
                                         }`}
-                                        style={{width: `${ultimoEnvio.probabilidade}%`}}
+                                        style={{width: `${ultimoEnvio.probabilidade === 0 ? 100 : ultimoEnvio.probabilidade}%`}}
                                     ></div>
                                 </div>
                                 <p className="text-[10px] text-slate-500 italic">
@@ -695,13 +702,22 @@
                                             <td className="py-3.5 px-4 text-center text-slate-300 font-mono">{item.redacao}</td>
                                             <td className="py-3.5 px-4 text-center font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-red-400 text-base">{item.nfc.toFixed(2)}</td>
                                             <td className="py-3.5 px-4 text-center">
-                                                <span
-                                                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border ${chance.bg} ${chance.text} ${chance.border}`}>
-                                                    <span className={`w-1.5 h-1.5 rounded-full ${
-                                                        item.probabilidade >= 75 ? 'bg-emerald-400' : item.probabilidade >= 45 ? 'bg-amber-400' : 'bg-rose-400'
-                                                    }`}></span>
-                                                    {chance.label} ({item.probabilidade.toFixed(1)}%)
-                                                </span>
+                                                {item.probabilidade === 0 ? (
+                                                    <span
+                                                        className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold border bg-rose-950/40 text-rose-500 border-rose-500/30">
+                                                        <span
+                                                            className="w-1.5 h-1.5 rounded-full bg-rose-500 mr-1.5"></span>
+                                                        Desclassificado
+                                                    </span>
+                                                ) : (
+                                                    <span
+                                                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border ${chance.bg} ${chance.text} ${chance.border}`}>
+                                                        <span className={`w-1.5 h-1.5 rounded-full ${
+                                                            item.probabilidade >= 75 ? 'bg-emerald-400' : item.probabilidade >= 45 ? 'bg-amber-400' : 'bg-rose-400'
+                                                        }`}></span>
+                                                        {chance.label} ({item.probabilidade.toFixed(1)}%)
+                                                    </span>
+                                                )}
                                             </td>
                                         </tr>
                                     );
