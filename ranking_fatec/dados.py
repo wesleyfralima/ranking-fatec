@@ -334,11 +334,11 @@ OFERTAS_ESTRUTURADAS: OfertasEstruturadas = {
     },
     "FATEC Ferraz de Vasconcelos": {
         PeriodoEnum.MANHA: [
-            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 30, 30.0, 1.0),
-            OfertaDTO("Gestão Empresarial", 35, 30.0, 1.0),
+            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 30, 30.0, 3.7),
+            OfertaDTO("Gestão Empresarial", 35, 30.0, 0.66),
         ],
         PeriodoEnum.NOITE: [
-            OfertaDTO("Gestão da Produção Industrial", 36, 30.0, 1.0),
+            OfertaDTO("Gestão da Produção Industrial", 36, 30.0, 1.17),
         ],
     },
     "FATEC Franca": {
@@ -882,20 +882,20 @@ OFERTAS_ESTRUTURADAS: OfertasEstruturadas = {
     },
     "FATEC Ipiranga": {
         PeriodoEnum.MANHA: [
-            OfertaDTO("Big Data para Negócios", 38, 30.0, 1.0),
-            OfertaDTO("Gestão Comercial", 36, 30.0, 1.0),
-            OfertaDTO("Gestão de Eventos", 35, 30.0, 1.0),
+            OfertaDTO("Big Data para Negócios", 38, 30.0, 1.05),
+            OfertaDTO("Gestão Comercial", 36, 30.0, 0.39),
+            OfertaDTO("Gestão de Eventos", 35, 30.0, 0.57),
         ],
         PeriodoEnum.TARDE: [
-            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 33, 30.0, 1.0),
+            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 33, 30.0, 1.73),
         ],
         PeriodoEnum.NOITE: [
-            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 33, 30.0, 1.0),
-            OfertaDTO("Gestão Comercial", 34, 30.0, 1.0),
-            OfertaDTO("Gestão de Recursos Humanos", 35, 30.0, 1.0),
+            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 33, 30.0, 7.48),
+            OfertaDTO("Gestão Comercial", 34, 30.0, 1.74),
+            OfertaDTO("Gestão de Recursos Humanos", 35, 30.0, 2.8),
         ],
         PeriodoEnum.EAD: [
-            OfertaDTO("Gestão Empresarial", 35, 30.0, 1.0),
+            OfertaDTO("Gestão Empresarial", 35, 30.0, 3.09),
         ],
     },
     "FATEC Itaquera": {
@@ -990,20 +990,20 @@ OFERTAS_ESTRUTURADAS: OfertasEstruturadas = {
     },
     "FATEC Zona Leste": {
         PeriodoEnum.MANHA: [
-            OfertaDTO("Comércio Exterior", 33, 30.0, 1.0),
-            OfertaDTO("Desenvolvimento de Software Multiplataforma", 30, 30.0, 1.0),
-            OfertaDTO("Gestão de Recursos Humanos", 33, 30.0, 1.0),
-            OfertaDTO("Gestão Empresarial", 31, 30.0, 1.0),
-            OfertaDTO("Logística", 31, 30.0, 1.0),
+            OfertaDTO("Comércio Exterior", 33, 30.0, 1.45),
+            OfertaDTO("Desenvolvimento de Software Multiplataforma", 30, 30.0, 2.27),
+            OfertaDTO("Gestão de Recursos Humanos", 33, 30.0, 2.0),
+            OfertaDTO("Gestão Empresarial", 31, 30.0, 1.39),
+            OfertaDTO("Logística", 31, 30.0, 1.32),
         ],
         PeriodoEnum.TARDE: [
-            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 31, 30.0, 1.0),
-            OfertaDTO("Comércio Exterior", 34, 30.0, 1.0),
+            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 31, 30.0, 2.74),
+            OfertaDTO("Comércio Exterior", 34, 30.0, 1.15),
         ],
         PeriodoEnum.NOITE: [
-            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 30, 30.0, 1.0),
-            OfertaDTO("Logística", 30, 30.0, 1.0),
-            OfertaDTO("Polímeros", 39, 30.0, 1.0),
+            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 30, 30.0, 14.13),
+            OfertaDTO("Logística", 30, 30.0, 3.47),
+            OfertaDTO("Polímeros", 39, 30.0, 1.18),
         ],
         PeriodoEnum.EAD: [
             OfertaDTO("Gestão Empresarial", 33, 30.0, 1.0),

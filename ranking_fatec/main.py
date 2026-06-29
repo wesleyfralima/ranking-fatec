@@ -95,68 +95,64 @@ def calcular_probabilidade_aprovacao(
     vagas: int,
     rank: int,
     cv: float,
+    acertos: int,
+    redacao: float,
     nota_corte: float | None = None,
-    usar_nota_corte: bool = False,
 ) -> float:
     """
     Estima a probabilidade de aprovação utilizando um modelo logístico.
 
-    Variáveis utilizadas:
-        - NFC do candidato
-        - Relação candidato/vaga
-        - Ranking atual
-        - Nota de corte (opcional)
-
-    Retorna:
-        Probabilidade entre 1,0 e 99,9 (%)
-
-    OBS:
-        Os coeficientes foram escolhidos empiricamente e podem ser
-        calibrados futuramente com dados reais.
+    Regras aplicadas:
+        - Redação zero ou zero acertos nas objetivas descarta o candidato (0%).
+        - Ranking atenuado devido à amostragem baixa.
+        - Foco principal na diferença da nota de corte histórica e concorrência.
     """
+
+    # --------------------------------------
+    # 1) Desclassificação Direta pelo Edital
+    # --------------------------------------
+    if redacao == 0.0 or acertos == 0:
+        return 0.0
 
     score: float = 0.0
 
-    # ----------------------------
-    # 1) Ranking (principal fator)
-    # ----------------------------
-    if rank > 0:
-        posicao_relativa = (vagas - rank) / max(vagas, 1)
-
-        # varia aproximadamente de -∞ até 1
-        score += 2.8 * posicao_relativa
-
-    # ----------------------------
-    # 2) Nota de corte (opcional)
-    # ----------------------------
-    if usar_nota_corte and nota_corte is not None:
+    # --------------------------------------
+    # 2) Nota de Corte (Maior carga de cálculo)
+    # --------------------------------------
+    if nota_corte is not None:
         diff = nfc - nota_corte
 
-        # Cursos muito concorridos exigem margem maior
-        fator = 1 / (1 + math.log1p(max(cv - 1, 0)))
+        # Cursos muito concorridos exigem uma margem de segurança maior
+        fator_concorrencia = 1.0 / (1.0 + math.log1p(max(cv - 1, 0)))
 
-        score += diff * 0.09 * fator
-
+        # Aumentamos o peso do impacto da nota de corte (antigo era 0.09)
+        score += diff * 0.25 * fator_concorrencia
     else:
-        #
-        # Sem nota de corte:
-        # Usa apenas a NFC como um leve indicativo.
-        #
-        score += (nfc - 700) * 0.01
+        # Se não houver nota de corte disponível,
+        # usa a NFC ponderada de forma mais branda
+        score += (nfc - 650) * 0.02
 
-    # ----------------------------
-    # 3) Concorrência
-    # ----------------------------
-    #
-    # Penaliza cursos extremamente concorridos.
-    #
-    score -= math.log1p(cv) * 0.35
+    # --------------------------------------
+    # 3) Concorrência (Peso aumentado no cálculo)
+    # --------------------------------------
+    # Penaliza e equilibra o score baseando-se no tamanho da disputa do curso
+    score -= math.log1p(cv) * 0.60
 
-    # ----------------------------
-    # 4) Probabilidade
-    # ----------------------------
+    # --------------------------------------
+    # 4) Ranking (Peso atenuado por conta da amostragem baixa)
+    # --------------------------------------
+    if rank > 0:
+        posicao_relativa = (vagas - rank) / max(vagas, 1)
+        # Reduzido drasticamente de 2,8 para 0,50 para
+        # não distorcer o cálculo nesta fase amostral
+        score += 0.50 * posicao_relativa
+
+    # --------------------------------------
+    # 5) Conversão para Porcentagem
+    # --------------------------------------
     prob = sigmoid(score)
 
+    # Mantemos uma margem para quem não foi desclassificado direto
     porcentagem = min(max(prob * 100, 1.0), 99.9)
 
     return round(porcentagem, 2)
@@ -170,9 +166,7 @@ def recalcular_probabilidades(
 ) -> None:
     """
     Recalcula o ranking e a probabilidade de TODOS os candidatos
-    de um mesmo curso.
-
-    Deve ser chamada sempre que um candidato for inserido ou atualizado.
+    do mesmo curso, local (faculdade) e período específico.
     """
 
     oferta = (
@@ -188,6 +182,7 @@ def recalcular_probabilidades(
     if oferta is None:
         return
 
+    # O ranking já é gerado isolado por Curso, Local e Período
     candidatos = (
         db.query(Candidato)
         .filter(
@@ -202,17 +197,54 @@ def recalcular_probabilidades(
         .all()
     )
 
-    usar_corte = oferta.nota_corte_historica is not None
-
     for rank, candidato in enumerate(candidatos, start=1):
         candidato.probabilidade = calcular_probabilidade_aprovacao(
             nfc=candidato.nfc,
             vagas=oferta.vagas,
             rank=rank,
             cv=oferta.cand_vaga_historico,
-            nota_corte=oferta.nota_corte_historica,
-            usar_nota_corte=usar_corte,
+            acertos=candidato.acertos,
+            redacao=candidato.redacao,
+            nota_corte=None,  # oferta.nota_corte_historica,
         )
+
+
+def recalcular_todos_os_candidatos_do_banco(db: Session) -> dict:
+    """
+    Busca apenas as combinações de faculdade/curso/período que possuem
+    pelo menos um candidato cadastrado e força o recálculo do grupo.
+    """
+    try:
+        # Busca apenas os grupos (chaves compostas) que possuem candidatos ativos
+        grupos_ativos = (
+            db.query(Candidato.faculdade, Candidato.curso, Candidato.periodo)
+            .distinct()
+            .all()
+        )
+
+        contador_grupos = 0
+
+        # Varre apenas os grupos que realmente têm trabalho a ser feito
+        for faculdade, curso, periodo in grupos_ativos:
+            recalcular_probabilidades(
+                db=db, faculdade=faculdade, curso=curso, periodo=periodo
+            )
+            contador_grupos += 1
+
+        db.commit()
+
+        return {
+            "status": "sucesso",
+            "mensagem": (
+                f"Probabilidades atualizadas com sucesso para "
+                f"{contador_grupos} grupos de candidatos ativos."
+            ),
+        }
+
+    except Exception as e:
+        db.rollback()
+        logging.error(f"Erro ao rodar recálculo geral otimizado: {str(e)}")
+        raise e
 
 
 # --- Endpoints da API ---
@@ -361,6 +393,11 @@ def adicionar_nota(candidato_in: CandidatoInput, db: Session = Depends(get_db)):
                 "Verifique os dados e tente novamente.",
             ),
         )
+
+
+@app.get("/api/admin/recalcular")
+def disparar_recalculo_geral(db: Session = Depends(get_db)):
+    return recalcular_todos_os_candidatos_do_banco(db)
 
 
 @app.get("/", response_class=HTMLResponse)
