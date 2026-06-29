@@ -30,7 +30,7 @@ app.add_middleware(
 
 # Pydantic schemas para validação de dados recebidos
 class CandidatoInput(BaseModel):
-    nome: str = Field(..., max_length=30)
+    nome: str = Field(..., min_length=5, max_length=30)
     faculdade: str = Field(..., max_length=100)
     curso: str = Field(..., max_length=100)
     periodo: str = Field(..., max_length=20)

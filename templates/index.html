@@ -275,6 +275,12 @@
 
         const handleSubmit = async (e) => {
             e.preventDefault();
+
+            if (!form.nome || form.nome.trim().length < 5) {
+                lancarNotificacao("O Nome ou Nick deve ter no mínimo 5 caracteres!", "erro");
+                return;
+            }
+
             if (!form.nome || !form.faculdade || !form.curso || !form.periodo) {
                 lancarNotificacao("Complete o fluxo de campus, período e curso para enviar!", "erro");
                 return;
