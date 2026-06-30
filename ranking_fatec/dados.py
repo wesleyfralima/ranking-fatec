@@ -126,13 +126,13 @@ OFERTAS_ESTRUTURADAS: OfertasEstruturadas = {
     },
     "FATEC Araraquara": {
         PeriodoEnum.MANHA: [
-            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 30, None, 2.8),
-            OfertaDTO("Gestão Empresarial", 34, None, 0.74),
+            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 30, 74.800, 2.8),
+            OfertaDTO("Gestão Empresarial", 34, 52.800, 0.74),
         ],
         PeriodoEnum.NOITE: [
-            OfertaDTO("Gestão Comercial", 36, None, 1.17),
-            OfertaDTO("Gestão da Produção Industrial", 33, None, 1.52),
-            OfertaDTO("Segurança da Informação", 32, None, 3.03),
+            OfertaDTO("Gestão Comercial", 36, 55.746, 1.17),
+            OfertaDTO("Gestão da Produção Industrial", 33, 57.680, 1.52),
+            OfertaDTO("Segurança da Informação", 32, 66.294, 3.03),
         ],
     },
     "FATEC Araras": {
@@ -616,19 +616,19 @@ OFERTAS_ESTRUTURADAS: OfertasEstruturadas = {
     },
     "FATEC Mogi das Cruzes": {
         PeriodoEnum.MANHA: [
-            OfertaDTO("Gestão de Recursos Humanos", 34, None, None),
-            OfertaDTO("Logística", 35, None, None),
+            OfertaDTO("Gestão de Recursos Humanos", 34, 55.000, 1.76),
+            OfertaDTO("Logística", 35, 53.486, 1.57),
         ],
         PeriodoEnum.TARDE: [
-            OfertaDTO("Agronegócio", 35, None, None),
-            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 33, None, None),
+            OfertaDTO("Agronegócio", 35, 40.680, 0.14),
+            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 33, 76.086, 3.09),
         ],
         PeriodoEnum.NOITE: [
-            OfertaDTO("Agronegócio", 36, None, None),
-            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 31, None, None),
+            OfertaDTO("Agronegócio", 36, 55.000, 1.94),
+            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 31, 80.666, 9.77),
         ],
         PeriodoEnum.EAD: [
-            OfertaDTO("Gestão Empresarial", 31, None, None),
+            OfertaDTO("Gestão Empresarial", 31, 66.000, 5.06),
         ],
     },
     "FATEC Mogi Mirim": {
@@ -848,36 +848,36 @@ OFERTAS_ESTRUTURADAS: OfertasEstruturadas = {
     },
     "FATEC São José do Rio Preto": {
         PeriodoEnum.MANHA: [
-            OfertaDTO("Agronegócio", 32, None, None),
-            OfertaDTO("Informática para Negócios", 31, None, None),
+            OfertaDTO("Agronegócio", 32, 44.446, None),
+            OfertaDTO("Informática para Negócios", 31, 56.000, None),
         ],
         PeriodoEnum.TARDE: [
-            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 34, None, None),
+            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 34, 81.713, None),
         ],
         PeriodoEnum.NOITE: [
-            OfertaDTO("Agronegócio", 34, None, None),
+            OfertaDTO("Agronegócio", 34, 47.666, None),
             OfertaDTO("Gestão de Negócios e Inovação", 31, None, None),
-            OfertaDTO("Informática para Negócios", 31, None, None),
+            OfertaDTO("Informática para Negócios", 31, 69.666, None),
         ],
         PeriodoEnum.EAD: [
-            OfertaDTO("Gestão Empresarial", 32, None, None),
+            OfertaDTO("Gestão Empresarial", 32, 68.000, None),
         ],
     },
     "FATEC São José dos Campos": {
         PeriodoEnum.MANHA: [
-            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 35, None, None),
-            OfertaDTO("Desenvolvimento de Software Multiplataforma", 30, None, None),
-            OfertaDTO("Logística", 31, None, None),
+            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 35, 79.934, 5.06),
+            OfertaDTO("Desenvolvimento de Software Multiplataforma", 30, 73.473, 2.4),
+            OfertaDTO("Logística", 31, 56.466, 1.58),
         ],
         PeriodoEnum.NOITE: [
-            OfertaDTO("Banco de Dados", 30, None, None),
-            OfertaDTO("Gestão da Produção Industrial", 32, None, None),
-            OfertaDTO("Logística", 33, None, None),
-            OfertaDTO("Manutenção de Aeronaves", 34, None, None),
-            OfertaDTO("Projetos de Estruturas Aeronáuticas", 31, None, None),
+            OfertaDTO("Banco de Dados", 30, 74.847, 4.40),
+            OfertaDTO("Gestão da Produção Industrial", 32, 60.866, 1.91),
+            OfertaDTO("Logística", 33, 59.514, 2.12),
+            OfertaDTO("Manutenção de Aeronaves", 34, 71.566, 2.91),
+            OfertaDTO("Projetos de Estruturas Aeronáuticas", 31, 65.266, 2.23),
         ],
         PeriodoEnum.EAD: [
-            OfertaDTO("Gestão Empresarial", 35, None, None),
+            OfertaDTO("Gestão Empresarial", 35, 68.200, 3.94),
         ],
     },
     "FATEC Ipiranga": {
@@ -1102,19 +1102,19 @@ OFERTAS_ESTRUTURADAS: OfertasEstruturadas = {
     },
     "FATEC Taquaritinga": {
         PeriodoEnum.MANHA: [
-            OfertaDTO("Gestão da Produção Industrial", 39, None, None),
+            OfertaDTO("Gestão da Produção Industrial", 39, 34.667, 1.41),
         ],
         PeriodoEnum.TARDE: [
-            OfertaDTO("Agronegócio", 39, None, None),
-            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 39, None, None),
+            OfertaDTO("Agronegócio", 39, 28.600, 1.36),
+            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 39, 54.240, 1.46),
         ],
         PeriodoEnum.NOITE: [
-            OfertaDTO("Agronegócio", 36, None, None),
-            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 30, None, None),
-            OfertaDTO("Gestão da Produção Industrial", 38, None, None),
+            OfertaDTO("Agronegócio", 36, 49.134, 1.47),
+            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 30, 71.866, 4.2),
+            OfertaDTO("Gestão da Produção Industrial", 38, 43.266, 1.34),
         ],
         PeriodoEnum.EAD: [
-            OfertaDTO("Gestão Empresarial", 39, None, None),
+            OfertaDTO("Gestão Empresarial", 39, 53.534, 1.72),
         ],
     },
     "FATEC Tatuí": {
@@ -1136,14 +1136,14 @@ OFERTAS_ESTRUTURADAS: OfertasEstruturadas = {
     },
     "FATEC Taubaté": {
         PeriodoEnum.MANHA: [
-            OfertaDTO("Gestão de Recursos Humanos", 32, None, None),
+            OfertaDTO("Gestão de Recursos Humanos", 32, 48.400, 1.59),
         ],
         PeriodoEnum.NOITE: [
-            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 32, None, None),
-            OfertaDTO("Eletrônica Automotiva", 34, None, None),
+            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 32, 74.800, 4.88),
+            OfertaDTO("Eletrônica Automotiva", 34, 58.000, 1.68),
         ],
         PeriodoEnum.EAD: [
-            OfertaDTO("Gestão Empresarial", 31, None, None),
+            OfertaDTO("Gestão Empresarial", 31, 65.266, 2.94),
         ],
     },
     "FATEC Votorantim": {
