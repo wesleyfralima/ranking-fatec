@@ -55,7 +55,7 @@ def calcular_nota_final(
     r = redacao
     nf = ((8 * n) + (2 * r)) / 10
 
-    # 5. Sistema de Pontuação Acrescida -> Nota Final do Candidato (NFC)
+    # 5. Sistema de Pontuação Acrescida → Nota Final do Candidato (NFC)
     if is_afro and is_publica:
         nfc = nf * 1.13
     elif not is_afro and is_publica:
@@ -253,7 +253,7 @@ def recalcular_probabilidades(
             cv=oferta.cand_vaga_historico,
             acertos=candidato.acertos,
             redacao=candidato.redacao,
-            nota_corte=None,  # oferta.nota_corte_historica,
+            nota_corte=oferta.nota_corte_historica,
         )
 
 
