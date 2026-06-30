@@ -37,13 +37,17 @@ def modelo_v1_estatico(nfc: float, nota_corte: float) -> float:
 
 
 def modelo_v2_dinamico_cv(nfc: float, cv: float, nota_corte: float) -> float:
-    """Novo Modelo: O C/V atual do curso dita a rigidez da nota de corte."""
+    """Novo Modelo: O C/V atua como achatador de certeza (gerador de incerteza).
+
+    C/V Alto -> fator_cv diminui -> pesos caem -> notas ficam perto de 50%.
+    C/V Baixo -> fator_cv aumenta -> pesos sobem -> decisões de aprovação são rápidas.
+    """
     score = 500.0
     nota_corte_ajustada = nota_corte * 0.965
     diff = nfc - nota_corte_ajustada
 
-    # C/V padrão ancorado em 3.5. Ajusta a sensibilidade da reta.
-    fator_cv = math.log1p(cv) / math.log1p(3.5)
+    # Inversão da lógica: Âncora 3.5 agora fica no numerador
+    fator_cv = math.log1p(3.5) / math.log1p(cv)
 
     if diff >= 0:
         score += min(diff * (20.0 * fator_cv), 450.0)
@@ -113,15 +117,30 @@ def analisar_variacoes_no_bd(db: Session):
                 f"🎓 {oferta.campus} • {oferta.curso} ({oferta.periodo}) | Vagas: {oferta.vagas} | C/V: {cv}"
             )
             print(
-                f"📝 Nota NFC: {nfc} | Corte Projetado: {round(corte_ajustado, 2)} ({status_corte})"
+                f"📝 Nota NFC: {round(nfc, 2)} | Corte Projetado: {round(corte_ajustado, 2)} ({status_corte})"
             )
             print(f"   ↳ [V1 Estático]: {prob_v1}%")
             print(f"   ↳ [V2 C/V Dinâmico]: {prob_v2}% (Variação: {diff:+}%)")
 
-            if diff < 0:
-                print("   ⚠️ Alta concorrência aumentou o rigor: a chance caiu.")
+            # Diagnóstico semântico corrigido baseado na nova premissa
+            if cv > 3.5:
+                if nfc >= corte_ajustado:
+                    print(
+                        "   ⚠️ Concorrência alta gerou incerteza: chance caiu em direção aos 50%."
+                    )
+                else:
+                    print(
+                        "   ✅ Concorrência alta suavizou a queda extrema: chance subiu em direção aos 50%."
+                    )
             else:
-                print("   ✅ Baixa concorrência suavizou a régua: a chance subiu.")
+                if nfc >= corte_ajustado:
+                    print(
+                        "   ✅ Concorrência baixa trouxe mais certeza: chance subiu rápido."
+                    )
+                else:
+                    print(
+                        "   ⚠️ Concorrência baixa trouxe mais certeza: chance caiu rápido."
+                    )
 
     print("\n" + "=" * 80)
     print(f"📊 RESUMO DO IMPACTO:")
@@ -136,6 +155,5 @@ def analisar_variacoes_no_bd(db: Session):
 
 
 if __name__ == "__main__":
-    # Roda utilizando o generator padrão do get_db
     with next(get_db()) as session:
         analisar_variacoes_no_bd(session)
