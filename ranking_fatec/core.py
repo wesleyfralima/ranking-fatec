@@ -146,7 +146,7 @@ def calcular_probabilidade_aprovacao(
 
         # Ponderação histórica: Considera que a prova foi
         # levemente mais difícil do que a do 1º semestre de 2026
-        # Ex: 84,00 * 0.965 = 81,06
+        # Ex: 84,00 * 0,98 = 82,32
         nota_corte_ajustada = nota_corte * 0.98
         diff = nfc - nota_corte_ajustada
 
