@@ -633,14 +633,14 @@ OFERTAS_ESTRUTURADAS: OfertasEstruturadas = {
     },
     "FATEC Mogi Mirim": {
         PeriodoEnum.MANHA: [
-            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 31, None, None),
+            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 31, 65.333, 1.71),
         ],
         PeriodoEnum.NOITE: [
-            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 32, None, None),
-            OfertaDTO("Projetos Mecânicos", 38, None, None),
+            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 32, 74.066, 5.16),
+            OfertaDTO("Projetos Mecânicos", 38, 49.866, 2.13),
         ],
         PeriodoEnum.EAD: [
-            OfertaDTO("Gestão Empresarial", 34, None, None),
+            OfertaDTO("Gestão Empresarial", 34, 61.600, 3.59),
         ],
     },
     "FATEC Olímpia": {
@@ -848,19 +848,19 @@ OFERTAS_ESTRUTURADAS: OfertasEstruturadas = {
     },
     "FATEC São José do Rio Preto": {
         PeriodoEnum.MANHA: [
-            OfertaDTO("Agronegócio", 32, 44.446, None),
-            OfertaDTO("Informática para Negócios", 31, 56.000, None),
+            OfertaDTO("Agronegócio", 32, 44.446, 1.00),
+            OfertaDTO("Informática para Negócios", 31, 56.000, 1.35),
         ],
         PeriodoEnum.TARDE: [
-            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 34, 81.713, None),
+            OfertaDTO("Análise e Desenvolvimento de Sistemas (ADS)", 34, 81.713, 3.68),
         ],
         PeriodoEnum.NOITE: [
-            OfertaDTO("Agronegócio", 34, 47.666, None),
-            OfertaDTO("Gestão de Negócios e Inovação", 31, None, None),
-            OfertaDTO("Informática para Negócios", 31, 69.666, None),
+            OfertaDTO("Agronegócio", 34, 47.666, 1.41),
+            OfertaDTO("Gestão de Negócios e Inovação", 31, None, 1.84),
+            OfertaDTO("Informática para Negócios", 31, 69.666, 3.03),
         ],
         PeriodoEnum.EAD: [
-            OfertaDTO("Gestão Empresarial", 32, 68.000, None),
+            OfertaDTO("Gestão Empresarial", 32, 68.000, 4.22),
         ],
     },
     "FATEC São José dos Campos": {
