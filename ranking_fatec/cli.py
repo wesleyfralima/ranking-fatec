@@ -3,9 +3,9 @@ import logging
 from sqlalchemy import Row
 from sqlalchemy.orm import Session
 
+from ranking_fatec.core import recalcular_probabilidades
 from ranking_fatec.dados import DADOS_OFERTAS_INICIAIS
 from ranking_fatec.db import get_db
-from ranking_fatec.main import recalcular_probabilidades
 from ranking_fatec.models import Candidato, Oferta
 
 
