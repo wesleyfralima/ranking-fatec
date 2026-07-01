@@ -408,6 +408,12 @@
         });
 
         const obterCorClassChance = (prob) => {
+            if (prob === 100) return {
+                text: "text-emerald-400",
+                bg: "bg-emerald-950/60",
+                border: "border-emerald-500/30",
+                label: "Aprovado"
+            };
             if (prob >= 75) return {
                 text: "text-emerald-400",
                 bg: "bg-emerald-950/60",
@@ -821,12 +827,29 @@
                                                     </span>
                                                 ) : (
                                                     <span
-                                                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold border ${chance.bg} ${chance.text} ${chance.border}`}>
-                                                        <span className={`w-1.5 h-1.5 rounded-full ${
-                                                            item.probabilidade >= 75 ? 'bg-emerald-400' : item.probabilidade >= 45 ? 'bg-amber-400' : 'bg-rose-400'
-                                                        }`}></span>
-                                                        {chance.label} ({item.probabilidade.toFixed(1)}%)
-                                                    </span>
+                                                        className={`inline-flex items-center gap-1.5 rounded-full font-bold border transition-all
+    ${
+                                                            item.probabilidade === 100
+                                                                ? 'px-4 py-1.5 text-xs bg-gradient-to-r from-emerald-500 to-green-400 text-white border-emerald-300 shadow-lg shadow-emerald-500/40 animate-pulse'
+                                                                : `px-2.5 py-1 text-[10px] ${chance.bg} ${chance.text} ${chance.border}`
+                                                        }`}
+                                                    >
+    <span
+        className={`rounded-full ${
+            item.probabilidade === 100
+                ? 'w-2 h-2 bg-white'
+                : item.probabilidade >= 75
+                    ? 'w-1.5 h-1.5 bg-emerald-400'
+                    : item.probabilidade >= 45
+                        ? 'w-1.5 h-1.5 bg-amber-400'
+                        : 'w-1.5 h-1.5 bg-rose-400'
+        }`}
+    ></span>
+
+                                                        {item.probabilidade === 100
+                                                            ? '🏆 APROVADO'
+                                                            : `${chance.label} (${item.probabilidade.toFixed(1)}%)`}
+</span>
                                                 )}
                                             </td>
                                         </tr>
