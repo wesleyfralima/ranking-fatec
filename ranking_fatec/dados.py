@@ -651,23 +651,23 @@ OFERTAS_ESTRUTURADAS: OfertasEstruturadas = {
     },
     "FATEC Osasco": {
         PeriodoEnum.MANHA: [
-            OfertaDTO("Automação Industrial", 32, None, None),
-            OfertaDTO("Manutenção Industrial", 39, None, None),
-            OfertaDTO("Sistemas Biomédicos", 34, None, None),
+            OfertaDTO("Automação Industrial", 32, 54.994, 1.81),
+            OfertaDTO("Manutenção Industrial", 39, 49.720, 1.18),
+            OfertaDTO("Sistemas Biomédicos", 34, 52.066, 1.85),
         ],
         PeriodoEnum.TARDE: [
-            OfertaDTO("Gestão Financeira", 34, None, None),
-            OfertaDTO("Redes de Computadores", 35, None, None),
+            OfertaDTO("Gestão Financeira", 34, 39.333, 1.82),
+            OfertaDTO("Redes de Computadores", 35, 32.667, 1.60),
         ],
         PeriodoEnum.NOITE: [
-            OfertaDTO("Automação Industrial", 31, None, None),
-            OfertaDTO("Desenvolvimento de Software Multiplataforma", 30, None, None),
-            OfertaDTO("Gestão Financeira", 32, None, None),
-            OfertaDTO("Manutenção Industrial", 33, None, None),
-            OfertaDTO("Redes de Computadores", 32, None, None),
+            OfertaDTO("Automação Industrial", 31, 67.466, 4.87),
+            OfertaDTO("Desenvolvimento de Software Multiplataforma", 30, 71.886, 5.97),
+            OfertaDTO("Gestão Financeira", 32, 63.800, 4.50),
+            OfertaDTO("Manutenção Industrial", 33, 53.486, 2.39),
+            OfertaDTO("Redes de Computadores", 32, 61.600, 2.69),
         ],
         PeriodoEnum.EAD: [
-            OfertaDTO("Gestão Empresarial", 30, None, None),
+            OfertaDTO("Gestão Empresarial", 30, 68.934, 3.90),
         ],
     },
     "FATEC Ourinhos": {
