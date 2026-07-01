@@ -372,7 +372,9 @@
 
             const chanceTexto = ultimoEnvio.probabilidade === 0
                 ? "Desclassificado"
-                : `${ultimoEnvio.probabilidade.toFixed(1)}%`;
+                : ultimoEnvio.probabilidade === 100
+                    ? "Aprovado"
+                    : `${ultimoEnvio.probabilidade.toFixed(1)}%`;
 
             const md = `### 📊 Meu Desempenho no Vestibular FATEC!\n\n` +
                 `* 🏛️ **Campus:** ${ultimoEnvio.faculdade}\n` +
@@ -409,10 +411,10 @@
 
         const obterCorClassChance = (prob) => {
             if (prob === 100) return {
-                text: "text-emerald-400",
-                bg: "bg-emerald-950/60",
-                border: "border-emerald-500/30",
-                label: "Aprovado"
+                text: "text-emerald-300",
+                bg: "bg-gradient-to-r from-emerald-500 to-green-600 shadow-lg shadow-emerald-500/20 animate-pulse",
+                border: "border-emerald-300/60",
+                label: "APROVADO"
             };
             if (prob >= 75) return {
                 text: "text-emerald-400",
@@ -464,10 +466,17 @@
                             <div className="bg-slate-900/80 p-3.5 rounded-xl border border-slate-750 space-y-1.5">
                                 <div className="flex justify-between items-center text-xs">
                                     <span className="text-slate-400 font-semibold uppercase tracking-wider">Chance Estimada de Aprovação</span>
-                                    <span
-                                        className={`font-bold ${ultimoEnvio.probabilidade === 0 ? 'text-rose-400' : obterCorClassChance(ultimoEnvio.probabilidade).text}`}>
-                                        {ultimoEnvio.probabilidade === 0 ? 'Desclassificado' : `${ultimoEnvio.probabilidade.toFixed(1)}%`}
-                                    </span>
+                                    {ultimoEnvio.probabilidade === 100 ? (
+                                        <span
+                                            className="px-3 py-1 text-xs font-black tracking-wide rounded-full bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-md border border-emerald-400 animate-pulse">
+                                            APROVADO
+                                        </span>
+                                    ) : (
+                                        <span
+                                            className={`font-bold ${ultimoEnvio.probabilidade === 0 ? 'text-rose-400' : obterCorClassChance(ultimoEnvio.probabilidade).text}`}>
+                                            {ultimoEnvio.probabilidade === 0 ? 'Desclassificado' : `${ultimoEnvio.probabilidade.toFixed(1)}%`}
+                                        </span>
+                                    )}
                                 </div>
                                 <div className="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
                                     <div
@@ -827,29 +836,27 @@
                                                     </span>
                                                 ) : (
                                                     <span
-                                                        className={`inline-flex items-center gap-1.5 rounded-full font-bold border transition-all
-    ${
+                                                        className={`inline-flex items-center gap-1.5 rounded-full font-bold border border-slate-700/50 transition-all
+                                                        ${
                                                             item.probabilidade === 100
-                                                                ? 'px-4 py-1.5 text-xs bg-gradient-to-r from-emerald-500 to-green-400 text-white border-emerald-300 shadow-lg shadow-emerald-500/40 animate-pulse'
+                                                                ? 'px-4 py-1.5 text-xs text-white uppercase tracking-wider font-black ' + chance.bg + ' ' + chance.border
                                                                 : `px-2.5 py-1 text-[10px] ${chance.bg} ${chance.text} ${chance.border}`
                                                         }`}
                                                     >
-    <span
-        className={`rounded-full ${
-            item.probabilidade === 100
-                ? 'w-2 h-2 bg-white'
-                : item.probabilidade >= 75
-                    ? 'w-1.5 h-1.5 bg-emerald-400'
-                    : item.probabilidade >= 45
-                        ? 'w-1.5 h-1.5 bg-amber-400'
-                        : 'w-1.5 h-1.5 bg-rose-400'
-        }`}
-    ></span>
+                                                        <span
+                                                            className={`rounded-full ${
+                                                                item.probabilidade === 100
+                                                                    ? 'w-2 h-2 bg-white shadow-sm'
+                                                                    : item.probabilidade >= 75
+                                                                        ? 'w-1.5 h-1.5 bg-emerald-400'
+                                                                        : item.probabilidade >= 45
+                                                                            ? 'w-1.5 h-1.5 bg-amber-400'
+                                                                            : 'w-1.5 h-1.5 bg-rose-400'
+                                                            }`}
+                                                        ></span>
 
-                                                        {item.probabilidade === 100
-                                                            ? '🏆 APROVADO'
-                                                            : `${chance.label} (${item.probabilidade.toFixed(1)}%)`}
-</span>
+                                                        {chance.label + (item.probabilidade !== 100 ? ` (${item.probabilidade.toFixed(1)}%)` : '')}
+                                                    </span>
                                                 )}
                                             </td>
                                         </tr>
