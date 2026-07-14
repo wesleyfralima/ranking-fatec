@@ -98,6 +98,16 @@ def obter_ranking(db: Session = Depends(get_db)):
 
 
 @app.post("/api/ranking")
+def muito_obrigado():
+    raise HTTPException(
+        status_code=400,
+        detail=(
+            "Obrigado por usar esse site! "
+            "No momento não estamos mais recebendo respostas.",
+        ),
+    )
+
+
 def adicionar_nota(candidato_in: CandidatoInput, db: Session = Depends(get_db)):
     try:
         # Executa o cálculo isolado na nova função
